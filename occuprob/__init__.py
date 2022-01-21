@@ -2,6 +2,8 @@
 
 # Add imports here
 from .occuprob import *
+from .partitionfunctions import *
+from .superpositions import *
 
 # Handle versioneer
 from ._version import get_versions

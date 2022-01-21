@@ -5,7 +5,7 @@ import pytest
 
 import numpy as np
 
-from occuprob.approximations import ClassicalHarmonic
+from occuprob.superpositions import ClassicalHarmonicSuperposition
 
 
 def test_classical_harmonic():
@@ -18,7 +18,7 @@ def test_classical_harmonic():
     frequencies = np.array([[1.0], [1.0]])
     symmetry = np.array([1.0, 1.0])
     temperature = np.array([0.0, np.inf])
-    landscape = ClassicalHarmonic(energy, frequencies, symmetry)
+    landscape = ClassicalHarmonicSuperposition(energy, frequencies, symmetry)
 
     expected_probability = np.array([[1.0, 0.5], [0.0, 0.5]])
     calculated_probability = landscape.calc_probability(temperature)
