@@ -14,13 +14,13 @@ def test_classical_harmonic():
     calculated using the corresponding canonical partition funcion under
     the classical harmonic superposition approximation"""
 
-    energy = np.array([0.0, 0.5])
-    frequencies = np.array([[1.0], [1.0]])
+    energy = np.array([0.0, 0.1])
+    frequencies = np.array([[1.0, 1.0, 1.0], [3.0, 1.0, 1.0]])
     symmetry = np.array([1.0, 1.0])
     temperature = np.array([0.0, np.inf])
     landscape = ClassicalHarmonicSuperposition(energy, frequencies, symmetry)
 
-    expected_probability = np.array([[1.0, 0.5], [0.0, 0.5]])
+    expected_probability = np.array([[1.0, 0.75], [0.0, 0.25]])
     calculated_probability = landscape.calc_probability(temperature)
 
-    assert (calculated_probability == expected_probability).all()
+    assert pytest.approx(calculated_probability) == expected_probability

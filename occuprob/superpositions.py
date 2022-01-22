@@ -1,29 +1,21 @@
 """ Superposition approximations to the PES """
 
-from abc import ABC, abstractmethod
-
 import numpy as np
 
 import occuprob.partitionfunctions as pf
 
 
-class SuperpositionApproximation(ABC):
+class SuperpositionApproximation():
     """
-    An abstract class that represents a superposition approximation to the PES.
+    An abstract class that represents a superposition approximation of the PES.
 
     ...
 
-    Attributes
-    ----------
-    potential_energy : array_like
-        Potential energy values corresponding to each minima.
-    frequencies : array_like
-        Frequency values corresponding to each minima.
-    symmetry_order : array_like
-        Order of the point group symmetry of each minima.
-
     Methods
     -------
+    calc_partition_functions(temperature):
+        Calculates the individual partition function contributions of each
+        geometrically unique isomer
     calc_probability(temperature):
         Calculates the occupation probability in the temperature range provided.
     calc_ensemble_average(temperature, observable):
@@ -33,9 +25,28 @@ class SuperpositionApproximation(ABC):
         Calculates the canonical heat capacity for the given temperature range.
     """
 
-    @abstractmethod
+    def __init__(self):
+        self._partition_functions = []
+
     def calc_partition_functions(self, temperature):
-        """ Calculates the partition functions for each minima. """
+        """ Calculates the individual partition functions of each geometrically
+        unique isomer.
+
+        Parameters
+        ----------
+        temperature : array_like
+            Temperature range in K.
+
+        Returns
+        -------
+        partition_functions : array_like
+            Individual partition function contributions for each isomer.
+        """
+        contributions = [partition_function.calc_part_func(temperature) for
+                         partition_function in self._partition_functions]
+        partition_functions = np.prod(np.stack(contributions), axis=0)
+
+        return partition_functions
 
     def calc_probability(self, temperature):
         """
@@ -44,16 +55,23 @@ class SuperpositionApproximation(ABC):
         Parameters
         ----------
         temperature : array_like
-            Temperature range.
+            Temperature range in K.
 
         Returns
         -------
         occupation_probability : array_like
             Occupation probability.
         """
+        # Calculates the individual partition function contributions
         partition_functions = self.calc_partition_functions(temperature)
 
+        # The total partition function is the sum of all the individual
+        # contributions of each geometrically unique isomer
         total_partition_function = np.sum(partition_functions, axis=0)
+
+        # The probability of finding the system in some isomer is calculated
+        # as the quotient of its individual partition function divided by the
+        # total partition function
         occupation_probability = partition_functions / total_partition_function
 
         return occupation_probability
@@ -66,9 +84,9 @@ class SuperpositionApproximation(ABC):
         Parameters
         ----------
         temperature : array_like
-            Temperature range.
+            Temperature range in eV.
         observable : array_like
-            Temperature range.
+            Input observable.
 
         Returns
         -------
@@ -76,6 +94,9 @@ class SuperpositionApproximation(ABC):
             Occupation probability.
         """
 
+        # The ensemble average of a given observable is calculated as a
+        # weighted sum using the occupation probabilities of each unique isomer
+        # as the weights
         probability = self.calc_probability(temperature)
         ensemble_average = np.sum(observable[:, None] * probability, axis=0)
 
@@ -88,7 +109,7 @@ class SuperpositionApproximation(ABC):
         Parameters
         ----------
         temperature : array_like
-            Temperature range.
+            Temperature range in eV.
 
         Returns
         -------
@@ -103,19 +124,18 @@ class SuperpositionApproximation(ABC):
 
 class ClassicalHarmonicSuperposition(SuperpositionApproximation):
     """
-    A class that represents a classical harmonic superposition approximation
-    to the PES.
+    Represents a classical harmonic superposition approximation of the PES.
 
     ...
 
     Attributes
     ----------
     potential_energy : array_like
-        Potential energy values corresponding to each minima.
+        Potential energy values (in eV) of each geometrically unique isomer.
     frequencies : array_like
-        Frequency values corresponding to each minima.
+        Frequency values corresponding to each geometrically unique isomer.
     symmetry_order : array_like
-        Order of the point group symmetry of each minima.
+        Order of the point group symmetry of each geometrically unique isomer.
 
     Methods
     -------
@@ -128,19 +148,13 @@ class ClassicalHarmonicSuperposition(SuperpositionApproximation):
         temperature range.
     """
     def __init__(self, energy, frequencies, symmetry_order):
+        super().__init__()
+
         self.energy = energy
-        self.global_minimum_index = np.argmin(self.energy)
+        self.global_minimum = np.argmin(self.energy)
         self.frequencies = frequencies
         self.symmetry_order = symmetry_order
 
         # Partition functions
-        self.electronic_pf = pf.Electronic(self.energy, 1.0)
-        self.vibrational_pf = pf.ClassicalHarmonic(self.frequencies)
-
-    def calc_partition_functions(self, temperature):
-        """ Calculates the partition function for each minima. """
-
-        partition_functions = (self.electronic_pf.calc_part_func(temperature) *
-                               self.vibrational_pf.calc_part_func(temperature))
-
-        return partition_functions
+        self._partition_functions = [pf.ElectronicPF(self.energy, 1.0),
+                                     pf.ClassicalHarmonicPF(self.frequencies)]

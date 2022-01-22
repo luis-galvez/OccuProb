@@ -1,10 +1,50 @@
 """ Partition functions """
 
 from abc import ABC, abstractmethod
+
 import numpy as np
 
 # Boltzmann constant in eV/K
 KB = 8.617333262145e-5
+
+
+def calc_beta(temperature):
+    """
+    Converts a temperature array into a beta=1/(KB*temperature) array.
+
+    Parameters
+    ----------
+    temperature : array_like
+        Temperature in K.
+
+    Returns
+    -------
+    beta : array_like
+        Beta array in eV^-1.
+    """
+    beta = np.divide(1., KB * temperature, where=temperature > 0,
+                     out=np.inf * np.ones(temperature.shape))
+
+    return beta
+
+
+def calc_geometric_mean(array):
+    """
+    Calculates the geometric mean of the input array.
+
+    Parameters
+    ----------
+    array : array_like
+        Input array.
+
+    Returns
+    -------
+    geometric_mean : array_like
+        Geometric mean of the input array.
+    """
+    geometric_mean = np.exp(np.log(array).mean(axis=1))
+
+    return geometric_mean
 
 
 class PartitionFunction(ABC):
@@ -26,7 +66,7 @@ class PartitionFunction(ABC):
         """
 
 
-class Electronic(PartitionFunction):
+class ElectronicPF(PartitionFunction):
     """
     Represents the canonical electronic partition function.
 
@@ -56,25 +96,24 @@ class Electronic(PartitionFunction):
         Parameters
         ----------
         temperature : array_like
-            Temperature range.
+            Temperature range in K.
 
         Returns
         -------
         partition_function: array_like
             Partition function.
         """
-        beta = np.divide(1., KB * temperature, where=temperature > 0,
-                         out=np.inf * np.ones(temperature.shape))
+        beta = calc_beta(temperature)
         exponent = np.multiply(self.relative_energy[:, None], beta[None, :],
                                where=self.relative_energy[:, None] > 0,
                                out=np.zeros((self.relative_energy.size,
                                              temperature.size)))
-        partition_function = np.exp(-exponent)
+        partition_function = self.spin_multiplicity * np.exp(-exponent)
 
         return partition_function
 
 
-class ClassicalHarmonic(PartitionFunction):
+class ClassicalHarmonicPF(PartitionFunction):
     """
     Represents the canonical vibrational partition function in the classical
     harmonic approximation.
@@ -92,7 +131,7 @@ class ClassicalHarmonic(PartitionFunction):
 
     def __init__(self, frequencies):
         self.frequencies = frequencies
-        self.degrees_of_freedom = frequencies.shape[0]
+        self.n_vib = frequencies.shape[1]  # Number of vibrational modes
 
     def calc_part_func(self, temperature):
         """
@@ -102,13 +141,17 @@ class ClassicalHarmonic(PartitionFunction):
         Parameters
         ----------
         temperature : array_like
-            Temperature range.
+            Temperature range in K.
 
         Returns
         -------
         partition_function: array_like
             Partition function.
         """
-        partition_function = 1.0
+
+        frequencies_gmean = calc_geometric_mean(self.frequencies)
+
+        partition_function = np.outer(np.power(frequencies_gmean, -self.n_vib),
+                                      np.ones_like(temperature))
 
         return partition_function
