@@ -7,6 +7,9 @@ import numpy as np
 # Boltzmann constant in eV/K
 KB = 8.617333262145e-5
 
+# Planck's constant in eV/THz
+H = 4.135667696e-3
+
 
 def calc_beta(temperature):
     """
@@ -26,6 +29,28 @@ def calc_beta(temperature):
                      out=np.inf * np.ones(temperature.shape))
 
     return beta
+
+
+def calc_exponential(observable, temperature):
+    """
+    Converts a temperature array into a beta=1/(KB*temperature) array.
+
+    Parameters
+    ----------
+    temperature : array_like
+        Temperature in K.
+
+    Returns
+    -------
+    beta : array_like
+        Beta array in eV^-1.
+    """
+    beta = calc_beta(temperature)[None, :]
+    output = np.multiply(np.zeros_like(observable), np.zeros_like(beta))
+    exponent = np.multiply(observable, beta, where=observable > 0, out=output)
+    exponential = np.exp(-exponent)
+
+    return exponential
 
 
 def calc_geometric_mean(array):
@@ -83,10 +108,12 @@ class ElectronicPF(PartitionFunction):
         temperature range.
     """
 
-    def __init__(self, potential_energy, spin_multiplicity):
+    def __init__(self, potential_energy, symmetry_order, spin_multiplicity):
         self.potential_energy = potential_energy
-        self.relative_energy = potential_energy - np.amin(potential_energy)
+        self.symmetry_order = symmetry_order
         self.spin_multiplicity = spin_multiplicity
+
+        self.relative_energy = potential_energy - np.amin(potential_energy)
 
     def calc_part_func(self, temperature):
         """
@@ -103,12 +130,10 @@ class ElectronicPF(PartitionFunction):
         partition_function: array_like
             Partition function.
         """
-        beta = calc_beta(temperature)
-        exponent = np.multiply(self.relative_energy[:, None], beta[None, :],
-                               where=self.relative_energy[:, None] > 0,
-                               out=np.zeros((self.relative_energy.size,
-                                             temperature.size)))
-        partition_function = self.spin_multiplicity * np.exp(-exponent)
+        partition_function = calc_exponential(self.relative_energy[:, None],
+                                              temperature)
+        partition_function /= self.symmetry_order[:, None]
+        partition_function *= self.spin_multiplicity[:, None]
 
         return partition_function
 
@@ -135,7 +160,7 @@ class ClassicalHarmonicPF(PartitionFunction):
 
     def calc_part_func(self, temperature):
         """
-        Calculates the vibrational partition function in the given
+        Calculates the classical vibrational partition function in the given
         temperature range.
 
         Parameters
@@ -153,5 +178,48 @@ class ClassicalHarmonicPF(PartitionFunction):
 
         partition_function = np.outer(np.power(frequencies_gmean, -self.n_vib),
                                       np.ones_like(temperature))
+
+        return partition_function
+
+
+class QuantumHarmonicPF(PartitionFunction):
+    """
+    Represents the canonical vibrational partition function in the quantum
+    harmonic approximation.
+
+    ...
+    frequencies : array_like
+        Frequency values corresponding to each minima.
+
+    Methods
+    -------
+    calc_partition_function(temperature):
+        Calculates the vibrational partition function in the given
+        temperature range.
+    """
+
+    def __init__(self, frequencies):
+        self.frequencies = frequencies
+
+    def calc_part_func(self, temperature):
+        """
+        Calculates the quantum vibrational partition function in the given
+        temperature range.
+
+        Parameters
+        ----------
+        temperature : array_like
+            Temperature range in K.
+
+        Returns
+        -------
+        partition_function: array_like
+            Partition function.
+        """
+        exponential = calc_exponential(0.5 * H * self.frequencies[:, :, None],
+                                       temperature)
+        print(exponential)
+        partition_function = np.prod(exponential / (1. - exponential**2), axis=1)
+        print(partition_function)
 
         return partition_function

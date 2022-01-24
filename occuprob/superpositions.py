@@ -7,7 +7,7 @@ import occuprob.partitionfunctions as pf
 
 class SuperpositionApproximation():
     """
-    An abstract class that represents a superposition approximation of the PES.
+    Represents a superposition approximation of the PES.
 
     ...
 
@@ -25,8 +25,15 @@ class SuperpositionApproximation():
         Calculates the canonical heat capacity for the given temperature range.
     """
 
-    def __init__(self):
-        self._partition_functions = []
+    def __init__(self, potential_energy, frequencies, symmetry_order,
+                 spin_multiplicity):
+        self.potential_energy = potential_energy
+        self.frequencies = frequencies
+        self.symmetry_order = symmetry_order
+        self.spin_multiplicity = spin_multiplicity
+
+        self.global_minimum = np.argmin(self.potential_energy)
+        self.partition_functions = []
 
     def calc_partition_functions(self, temperature):
         """ Calculates the individual partition functions of each geometrically
@@ -42,8 +49,12 @@ class SuperpositionApproximation():
         partition_functions : array_like
             Individual partition function contributions for each isomer.
         """
+        if not self.partition_functions:
+            print("You must include at least one partition function.")
+            return None
+
         contributions = [partition_function.calc_part_func(temperature) for
-                         partition_function in self._partition_functions]
+                         partition_function in self.partition_functions]
         partition_functions = np.prod(np.stack(contributions), axis=0)
 
         return partition_functions
@@ -122,7 +133,7 @@ class SuperpositionApproximation():
         return heat_capacity
 
 
-class ClassicalHarmonicSuperposition(SuperpositionApproximation):
+class ClassicalHarmonicSA(SuperpositionApproximation):
     """
     Represents a classical harmonic superposition approximation of the PES.
 
@@ -147,14 +158,49 @@ class ClassicalHarmonicSuperposition(SuperpositionApproximation):
         Calculates the ensemble average for the given observable in the provided
         temperature range.
     """
-    def __init__(self, energy, frequencies, symmetry_order):
-        super().__init__()
-
-        self.energy = energy
-        self.global_minimum = np.argmin(self.energy)
-        self.frequencies = frequencies
-        self.symmetry_order = symmetry_order
+    def __init__(self, potential_energy, frequencies, symmetry_order):
+        super().__init__(potential_energy, frequencies, symmetry_order,
+                         np.ones_like(potential_energy))
 
         # Partition functions
-        self._partition_functions = [pf.ElectronicPF(self.energy, 1.0),
-                                     pf.ClassicalHarmonicPF(self.frequencies)]
+        self.partition_functions = [pf.ElectronicPF(self.potential_energy,
+                                                    self.symmetry_order,
+                                                    self.spin_multiplicity),
+                                    pf.ClassicalHarmonicPF(self.frequencies)]
+
+
+class QuantumHarmonicSA(SuperpositionApproximation):
+    """
+    Represents a classical harmonic superposition approximation of the PES.
+
+    ...
+
+    Attributes
+    ----------
+    potential_energy : array_like
+        Potential energy values (in eV) of each geometrically unique isomer.
+    frequencies : array_like
+        Frequency values corresponding to each geometrically unique isomer.
+    symmetry_order : array_like
+        Order of the point group symmetry of each geometrically unique isomer.
+
+    Methods
+    -------
+    calc_probability(temperature):
+        Calculates the occupation probability in the temperature range provided.
+    calc_heat_capacity(temperature):
+        Calculates the canonical heat capacity for the given temperature range.
+    calc_average_observable(temperature, observable):
+        Calculates the ensemble average for the given observable in the provided
+        temperature range.
+    """
+    def __init__(self, potential_energy, frequencies, symmetry_order,
+                 spin_multiplicity):
+        super().__init__(potential_energy, frequencies, symmetry_order,
+                         spin_multiplicity)
+
+        # Partition functions
+        self.partition_functions = [pf.ElectronicPF(self.potential_energy,
+                                                    self.symmetry_order,
+                                                    self.spin_multiplicity),
+                                    pf.QuantumHarmonicPF(self.frequencies)]
