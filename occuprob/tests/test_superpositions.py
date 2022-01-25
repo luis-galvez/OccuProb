@@ -15,9 +15,9 @@ def test_classical_harmonic():
     the classical harmonic superposition approximation"""
 
     energy = np.array([0.0, 0.1])
-    frequencies = np.array([[1.0, 1.0, 1.0], [2.0, 1.0, 1.0]])
-    symmetry = np.array([3.0, 1.0])
-    temperature = np.array([0.0, np.inf])
+    frequencies = np.array([[1., 1., 1.], [2., 1., 1.]])
+    symmetry = np.array([3., 1.])
+    temperature = np.array([0., np.inf])
     landscape = ClassicalHarmonicSA(energy, frequencies, symmetry)
 
     expected_probability = np.array([[1.0, 0.4], [0.0, 0.6]])

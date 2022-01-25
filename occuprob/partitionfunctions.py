@@ -31,7 +31,7 @@ def calc_beta(temperature):
     return beta
 
 
-def calc_exponential(observable, temperature):
+def calc_exponential(observable, temperature, out=0.0):
     """
     Converts a temperature array into a beta=1/(KB*temperature) array.
 
@@ -46,7 +46,7 @@ def calc_exponential(observable, temperature):
         Beta array in eV^-1.
     """
     beta = calc_beta(temperature)[None, :]
-    output = np.multiply(np.zeros_like(observable), np.zeros_like(beta))
+    output = out * np.multiply(np.ones_like(observable), np.ones_like(beta))
     exponent = np.multiply(observable, beta, where=observable > 0, out=output)
     exponential = np.exp(-exponent)
 
@@ -218,8 +218,6 @@ class QuantumHarmonicPF(PartitionFunction):
         """
         exponential = calc_exponential(0.5 * H * self.frequencies[:, :, None],
                                        temperature)
-        print(exponential)
         partition_function = np.prod(exponential / (1. - exponential**2), axis=1)
-        print(partition_function)
 
         return partition_function
