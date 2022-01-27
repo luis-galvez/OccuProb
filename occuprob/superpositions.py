@@ -1,5 +1,27 @@
 """ Superposition approximations to the PES """
 
+# MIT License
+
+# Copyright (c) 2021-2022 Luis Gálvez
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 import numpy as np
 
 import occuprob.partitionfunctions as pf
@@ -32,7 +54,6 @@ class SuperpositionApproximation():
         self.symmetry_order = symmetry_order
         self.spin_multiplicity = spin_multiplicity
 
-        self.global_minimum = np.argmin(self.potential_energy)
         self.partition_functions = []
 
     def calc_partition_functions(self, temperature):
@@ -41,13 +62,14 @@ class SuperpositionApproximation():
 
         Parameters
         ----------
-        temperature : array_like
-            Temperature range in K.
+        temperature : :obj:`numpy.ndarray`
+            A 1D array of size M containing the temperature values in K.
 
         Returns
         -------
-        partition_functions : array_like
-            Individual partition function contributions for each isomer.
+        partition_functions : :obj:`numpy.ndarray`
+            A 2D array of shape (N, M) containing the individual partition
+            function contributions of each of the N minima.
         """
         if not self.partition_functions:
             print("You must include at least one partition function.")
@@ -65,13 +87,14 @@ class SuperpositionApproximation():
 
         Parameters
         ----------
-        temperature : array_like
-            Temperature range in K.
+        temperature : :obj:`numpy.ndarray`
+            A 1D array of size M containing the temperature values in K.
 
         Returns
         -------
-        occupation_probability : array_like
-            Occupation probability.
+        occupation_probability : :obj:`numpy.ndarray`
+            A 2D array of shape (N, M) containing the occupation probability of
+            each of the N minima.
         """
         # Calculates the individual partition function contributions
         partition_functions = self.calc_partition_functions(temperature)
@@ -94,15 +117,16 @@ class SuperpositionApproximation():
 
         Parameters
         ----------
-        temperature : array_like
-            Temperature range in eV.
-        observable : array_like
-            Input observable.
+        temperature : :obj:`numpy.ndarray`
+            A 1D array of size M containing the temperature values in K.
+        observable : :obj:`numpy.ndarray`
+            A 1D array of size N containing the input observable.
 
         Returns
         -------
-        calc_ensemble_average : array_like
-            Occupation probability.
+        ensemble_average : :obj:`numpy.ndarray`
+            A 1D array of shape M containing the ensemble average of the input
+            observable at every temperature provided.
         """
 
         # The ensemble average of a given observable is calculated as a
@@ -119,13 +143,13 @@ class SuperpositionApproximation():
 
         Parameters
         ----------
-        temperature : array_like
-            Temperature range in eV.
+        temperature : :obj:`numpy.ndarray`
+            A 1D array of size M containing the temperature values in K.
 
         Returns
         -------
-        heat_capacity : array_like
-            Canonical heat capacity.
+        heat_capacity : :obj:`numpy.ndarray`
+            A 1D array of shape M containing the heat capacity of the system.
         """
 
         heat_capacity = np.exp(self.calc_probability(temperature))
@@ -141,12 +165,14 @@ class ClassicalHarmonicSA(SuperpositionApproximation):
 
     Attributes
     ----------
-    potential_energy : array_like
-        Potential energy values (in eV) of each geometrically unique isomer.
-    frequencies : array_like
-        Frequency values corresponding to each geometrically unique isomer.
-    symmetry_order : array_like
-        Order of the point group symmetry of each geometrically unique isomer.
+    potential_energy : :obj:`numpy.ndarray`
+        A 1D array containing the energy values (in eV) of each of the N minima.
+    frequencies : :obj:`numpy.ndarray`
+        A 2D array of shape (N, D) containing the D frequency values (in THz) of
+        each of the N minima.
+    symmetry_order : :obj:`numpy.ndarray`
+        A 1D array of size M containing the order of the point group symmetry
+        corresponding to each minimum.
 
     Methods
     -------
@@ -177,12 +203,14 @@ class QuantumHarmonicSA(SuperpositionApproximation):
 
     Attributes
     ----------
-    potential_energy : array_like
-        Potential energy values (in eV) of each geometrically unique isomer.
-    frequencies : array_like
-        Frequency values corresponding to each geometrically unique isomer.
-    symmetry_order : array_like
-        Order of the point group symmetry of each geometrically unique isomer.
+    potential_energy : :obj:`numpy.ndarray`
+        A 1D array containing the energy values (in eV) of each of the N minima.
+    frequencies : :obj:`numpy.ndarray`
+        A 2D array of shape (N, D) containing the D frequency values (in THz) of
+        each of the N minima.
+    symmetry_order : :obj:`numpy.ndarray`
+        A 1D array of size M containing the order of the point group symmetry
+        corresponding to each minimum.
 
     Methods
     -------
