@@ -1,6 +1,7 @@
 """
 Unit and regression test for the occuprob package.
 """
+
 import pytest
 
 import numpy as np
@@ -14,18 +15,18 @@ def test_classical_harmonic():
     calculated using the corresponding canonical partition funcion under
     the classical harmonic superposition approximation"""
 
-    energy = np.array([0.0, 0.1])
+    energy = np.array([0.0, 0.001])
     frequencies = np.array([[1., 1., 1.], [2., 1., 1.]])
     symmetry = np.array([3., 1.])
     temperature = np.array([0., np.inf])
     landscape = ClassicalHarmonicSA(energy, frequencies, symmetry)
 
-    expected_probability = np.array([[1.0, 0.4], [0.0, 0.6]])
-    calculated_probability = landscape.calc_probability(temperature)
+    expected_prob = np.array([[1.0, 0.4], [0.0, 0.6]])
+    calculated_prob = landscape.calc_probability(temperature)
 
-    print(calculated_probability)
+    print(calculated_prob)
 
-    assert pytest.approx(calculated_probability) == expected_probability
+    assert pytest.approx(calculated_prob) == expected_prob
 
 
 def test_quantum_harmonic():
@@ -34,14 +35,14 @@ def test_quantum_harmonic():
     calculated using the corresponding canonical partition funcion under
     a quantum harmonic superposition approximation"""
 
-    energy = np.array([0.0, 0.1])
+    energy = np.array([0.0, 0.001])
     frequencies = np.array([[1.0, 1.0], [3.0, 1.0]])
     symmetry = np.array([1.0, 1.0])
     multiplicity = np.array([1.0, 1.0])
-    temperature = np.array([0.0, np.inf])
+    temperature = np.array([0.0, 1.0e4])
     landscape = QuantumHarmonicSA(energy, frequencies, symmetry, multiplicity)
 
-    expected_probability = np.array([[1.0, 0.75], [0.0, 0.25]])
-    calculated_probability = landscape.calc_probability(temperature)
+    expected_prob = np.array([[1.0, 0.75], [0.0, 0.25]])
+    calculated_prob = landscape.calc_probability(temperature)
 
-    assert pytest.approx(calculated_probability) == expected_probability
+    assert pytest.approx(calculated_prob, abs=0.001) == expected_prob
