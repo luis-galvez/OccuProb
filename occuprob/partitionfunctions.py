@@ -1,4 +1,4 @@
-""" Partition functions """
+""" Routines to calculate partition functions. """
 
 # MIT License
 
@@ -26,75 +26,10 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-# Boltzmann constant in eV/K
-KB = 8.617333262145e-5
+from occuprob.utils import calc_geometric_mean, calc_exponential
 
 # Planck's constant in eV/THz
 H = 4.135667696e-3
-
-
-def calc_beta(temperature):
-    """
-    Converts a temperature array into a beta=1/(KB*temperature) array.
-
-    Parameters
-    ----------
-    temperature : :obj:`numpy.ndarray`
-        A 1D array of size M containing the temperature values in K.
-
-    Returns
-    -------
-    beta : :obj:`numpy.ndarray`
-        A 1D array of size M containing the values of beta in eV^-1.
-    """
-    beta = np.divide(1., KB * temperature, where=temperature > 0,
-                     out=np.inf * np.ones(temperature.shape))
-
-    return beta
-
-
-def calc_exponential(energy, temperature):
-    """
-    Calculates the exponential of the form exp(-energy/(KB*temperature)) for
-    the given energy and temperature arrays.
-
-    Parameters
-    ----------
-    energy : :obj:`numpy.ndarray`
-        A 1D array of size N containing the energy values in eV.
-    temperature : :obj:`numpy.ndarray`
-        A 1D array of size M containing the temperature values in K.
-
-    Returns
-    -------
-    exponential : :obj:`numpy.ndarray`
-        Calculated exponential stored in a 2D array of shape (N, M)
-    """
-    beta = calc_beta(temperature)[None, :]
-    output = np.multiply(np.zeros_like(energy), np.zeros_like(beta))
-    exponent = np.multiply(energy, beta, where=energy > 0, out=output)
-    exponential = np.exp(-exponent)
-
-    return exponential
-
-
-def calc_geometric_mean(input_array):
-    """
-    Calculates the geometric mean of the input array.
-
-    Parameters
-    ----------
-    input_array : :obj:`numpy.ndarray`
-        Input 2D array of shape (N, D).
-
-    Returns
-    -------
-    geometric_mean : :obj:`numpy.ndarray`
-        A 1D array of size N contaning the geometric mean of the input.
-    """
-    geometric_mean = np.exp(np.log(input_array).mean(axis=1))
-
-    return geometric_mean
 
 
 class PartitionFunction(ABC):
@@ -157,7 +92,7 @@ class ElectronicPF(PartitionFunction):
             A 2D array of shape (N, M) contaning the calculated partition
             functions for each of the N minima at every temperature value.
         """
-        partition_function = calc_exponential(self.relative_energy[:, None],
+        partition_function = calc_exponential(self.relative_energy,
                                               temperature)
         partition_function /= self.symmetry_order[:, None]
         partition_function *= self.spin_multiplicity[:, None]
