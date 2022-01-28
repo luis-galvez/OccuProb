@@ -1,4 +1,4 @@
-""" Superposition approximations to the PES """
+""" Routines to calcuate Superposition Approximations to the PES. """
 
 # MIT License
 
