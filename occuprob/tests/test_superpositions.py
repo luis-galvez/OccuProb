@@ -1,5 +1,5 @@
 """
-Unit and regression test for the occuprob package.
+Unit and regression test for the occuprob.superposition package.
 """
 
 import pytest
