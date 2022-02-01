@@ -1,12 +1,14 @@
 """
-Unit and regression test for the occuprob.partitionfunctions package.
+Unit and regression tests for the occuprob.utils module.
 """
 
 import pytest
 
 import numpy as np
 
-from occuprob.utils import calc_beta, calc_geometric_mean, calc_exponential
+from occuprob.utils import calc_beta
+from occuprob.utils import calc_geometric_mean
+from occuprob.utils import calc_exponential
 
 
 def test_calc_beta():

@@ -1,4 +1,4 @@
-""" Routines to calcuate Superposition Approximations to the PES. """
+""" Module used to create Superposition Approximations to the PES. """
 
 # MIT License
 
@@ -24,8 +24,6 @@
 
 import numpy as np
 
-import occuprob.partitionfunctions as pf
-
 
 class SuperpositionApproximation():
     """
@@ -47,13 +45,7 @@ class SuperpositionApproximation():
         Calculates the canonical heat capacity for the given temperature range.
     """
 
-    def __init__(self, potential_energy, frequencies, symmetry_order,
-                 spin_multiplicity):
-        self.potential_energy = potential_energy
-        self.frequencies = frequencies
-        self.symmetry_order = symmetry_order
-        self.spin_multiplicity = spin_multiplicity
-
+    def __init__(self):
         self.partition_functions = []
 
     def calc_partition_functions(self, temperature):
@@ -99,6 +91,9 @@ class SuperpositionApproximation():
         # Calculates the individual partition function contributions
         partition_functions = self.calc_partition_functions(temperature)
 
+        if partition_functions is None:
+            return None
+
         # The total partition function is the sum of all the individual
         # contributions of each geometrically unique isomer
         total_partition_function = np.sum(partition_functions, axis=0)
@@ -133,6 +128,10 @@ class SuperpositionApproximation():
         # weighted sum using the occupation probabilities of each unique isomer
         # as the weights
         probability = self.calc_probability(temperature)
+
+        if probability is None:
+            return None
+
         ensemble_average = np.sum(observable[:, None] * probability, axis=0)
 
         return ensemble_average
@@ -152,83 +151,6 @@ class SuperpositionApproximation():
             A 1D array of shape M containing the heat capacity of the system.
         """
 
-        heat_capacity = np.exp(self.calc_probability(temperature))
+        heat_capacity = self.calc_ensemble_average(temperature, np.zeros((1,)))
 
         return heat_capacity
-
-
-class ClassicalHarmonicSA(SuperpositionApproximation):
-    """
-    Represents a classical harmonic superposition approximation of the PES.
-
-    ...
-
-    Attributes
-    ----------
-    potential_energy : :obj:`numpy.ndarray`
-        A 1D array containing the energy values (in eV) of each of the N minima.
-    frequencies : :obj:`numpy.ndarray`
-        A 2D array of shape (N, D) containing the D frequency values (in THz) of
-        each of the N minima.
-    symmetry_order : :obj:`numpy.ndarray`
-        A 1D array of size M containing the order of the point group symmetry
-        corresponding to each minimum.
-
-    Methods
-    -------
-    calc_probability(temperature):
-        Calculates the occupation probability in the temperature range provided.
-    calc_heat_capacity(temperature):
-        Calculates the canonical heat capacity for the given temperature range.
-    calc_average_observable(temperature, observable):
-        Calculates the ensemble average for the given observable in the provided
-        temperature range.
-    """
-    def __init__(self, potential_energy, frequencies, symmetry_order):
-        super().__init__(potential_energy, frequencies, symmetry_order,
-                         np.ones_like(potential_energy))
-
-        # Partition functions
-        self.partition_functions = [pf.ElectronicPF(self.potential_energy,
-                                                    self.symmetry_order,
-                                                    self.spin_multiplicity),
-                                    pf.ClassicalHarmonicPF(self.frequencies)]
-
-
-class QuantumHarmonicSA(SuperpositionApproximation):
-    """
-    Represents a classical harmonic superposition approximation of the PES.
-
-    ...
-
-    Attributes
-    ----------
-    potential_energy : :obj:`numpy.ndarray`
-        A 1D array containing the energy values (in eV) of each of the N minima.
-    frequencies : :obj:`numpy.ndarray`
-        A 2D array of shape (N, D) containing the D frequency values (in THz) of
-        each of the N minima.
-    symmetry_order : :obj:`numpy.ndarray`
-        A 1D array of size M containing the order of the point group symmetry
-        corresponding to each minimum.
-
-    Methods
-    -------
-    calc_probability(temperature):
-        Calculates the occupation probability in the temperature range provided.
-    calc_heat_capacity(temperature):
-        Calculates the canonical heat capacity for the given temperature range.
-    calc_average_observable(temperature, observable):
-        Calculates the ensemble average for the given observable in the provided
-        temperature range.
-    """
-    def __init__(self, potential_energy, frequencies, symmetry_order,
-                 spin_multiplicity):
-        super().__init__(potential_energy, frequencies, symmetry_order,
-                         spin_multiplicity)
-
-        # Partition functions
-        self.partition_functions = [pf.ElectronicPF(self.potential_energy,
-                                                    self.symmetry_order,
-                                                    self.spin_multiplicity),
-                                    pf.QuantumHarmonicPF(self.frequencies)]
