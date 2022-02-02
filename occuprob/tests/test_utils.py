@@ -41,7 +41,7 @@ def test_calc_exponent():
     energy = np.array([0., 1.])
     temperature = np.array([0., 11604.518121, 23209.036242])
 
-    expected_exponent = np.array([[0., 0., 1.], [np.inf, 1., 0.5]])
+    expected_exponent = np.array([[0., 0., 0.], [np.inf, 1., 0.5]])
     calculated_exponent = calc_exponent(energy, temperature)
 
     assert pytest.approx(calculated_exponent) == expected_exponent
