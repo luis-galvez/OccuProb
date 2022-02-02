@@ -114,6 +114,8 @@ def calc_csch(energy, temperature, temp_zero=0.):
         A 1D array of size N containing the energy values in eV.
     temperature : :obj:`numpy.ndarray`
         A 1D array of size M containing the temperature values in K.
+    temp_zero : float
+        Value which will be used to replace the output at temperature==0.
 
     Returns
     -------

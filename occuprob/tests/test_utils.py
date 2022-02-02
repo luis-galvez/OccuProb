@@ -42,7 +42,7 @@ def test_calc_exponential():
     temperature = np.array([0., 11604.5181216])
 
     expected_exponential = np.array([[1., 1.], [0., 0.367879441171]])
-    calculated_exponential = calc_exponential(energy, temperature)
+    calculated_exponential = calc_exponential(-energy, temperature)
     print(calculated_exponential)
 
     assert pytest.approx(calculated_exponential) == expected_exponential
