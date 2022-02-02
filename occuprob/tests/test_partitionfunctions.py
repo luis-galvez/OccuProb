@@ -52,7 +52,7 @@ def test_electronic_v():
     partition_function = ElectronicPF(potential_energy, spin_multiplicity)
 
     temperature = np.array([0., np.inf])
-    expected_part_func_v = 0.
+    expected_part_func_v = np.zeros([3, 2])
     calculated_part_func_v = partition_function.calc_part_func_v(temperature)
 
-    assert calculated_part_func_v == expected_part_func_v
+    assert (calculated_part_func_v == expected_part_func_v).all()
