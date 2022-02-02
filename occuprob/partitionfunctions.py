@@ -411,7 +411,9 @@ class QuantumHarmonicPF(PartitionFunction):
         """
         exponent = calc_exponent(0.5 * H * self.frequencies[:, :, None],
                                  temperature)
-        partition_function = np.prod(0.5 / np.sinh(exponent), axis=1)
+        csch = 0.5 / np.sinh(exponent, where=temperature > 0,
+                             out=np.ones_like(exponent))
+        partition_function = np.prod(csch, axis=1)
 
         return partition_function
 
