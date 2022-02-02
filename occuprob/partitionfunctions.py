@@ -27,9 +27,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from occuprob.utils import calc_beta
-from occuprob.utils import calc_exponential
-from occuprob.utils import calc_coth
-from occuprob.utils import calc_csch
+from occuprob.utils import calc_exponent
 from occuprob.utils import calc_geometric_mean
 
 # Planck's constant in eV/THz
@@ -145,8 +143,8 @@ class ElectronicPF(PartitionFunction):
             A 2D array of shape (N, M) contaning the calculated partition
             functions for each of the N isomers in the given temperature range.
         """
-        partition_function = calc_exponential(-self.relative_energy,
-                                              temperature)
+        exponent = calc_exponent(self.relative_energy, temperature)
+        partition_function = np.exp(-exponent)
         partition_function *= self.spin_multiplicity[:, None]
 
         return partition_function
@@ -411,9 +409,9 @@ class QuantumHarmonicPF(PartitionFunction):
             A 2D array of shape (N, M) contaning the calculated partition
             functions for each of the N isomers in the given temperature range.
         """
-        csch = calc_csch(-0.5 * H * self.frequencies[:, :, None], temperature,
-                         temp_zero=1.)
-        partition_function = np.prod(csch, axis=1)
+        exponent = calc_exponent(0.5 * H * self.frequencies[:, :, None],
+                                 temperature)
+        partition_function = np.prod(0.5 / np.sinh(exponent), axis=1)
 
         return partition_function
 
@@ -435,7 +433,9 @@ class QuantumHarmonicPF(PartitionFunction):
             temperature range.
         """
         beta = calc_beta(temperature)
-        coth = calc_coth(H * self.frequencies[:, :, None], temperature)
+        exponent = calc_exponent(0.5 * H * self.frequencies[:, :, None],
+                                 temperature)
+        coth = 1. / np.tanh(exponent)
 
         aux_w = -0.5 * H * np.sum(self.frequencies[:, :, None] * coth, axis=1)
         part_func_w = np.multiply(beta**2, aux_w, where=temperature > 0,
@@ -460,7 +460,9 @@ class QuantumHarmonicPF(PartitionFunction):
             of W for each of the N isomers, in the given temperature range.
         """
         beta = calc_beta(temperature)
-        csch = calc_csch(-0.5 * H * self.frequencies[:, :, None], temperature)
+        exponent = calc_exponent(0.5 * H * self.frequencies[:, :, None],
+                                 temperature)
+        csch = 0.5 / np.sinh(exponent)
 
         aux_v = np.sum((H * self.frequencies[:, :, None] * csch)**2, axis=1)
         part_func_v = np.multiply(beta**2, aux_v, where=temperature > 0,

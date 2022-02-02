@@ -8,7 +8,7 @@ import numpy as np
 
 from occuprob.utils import calc_beta
 from occuprob.utils import calc_geometric_mean
-from occuprob.utils import calc_exponential
+from occuprob.utils import calc_exponent
 
 
 def test_calc_beta():
@@ -35,14 +35,13 @@ def test_calc_geometric_mean():
     assert pytest.approx(calculated_gmean) == expected_gmean
 
 
-def test_calc_exponential():
-    """ Unit test for the calc_exponential function."""
+def test_calc_exponent():
+    """ Unit test for the calc_exponent function."""
 
     energy = np.array([0., 1.])
-    temperature = np.array([0., 11604.5181216])
+    temperature = np.array([0., 11604.518121, 23209.036242])
 
-    expected_exponential = np.array([[1., 1.], [0., 0.367879441171]])
-    calculated_exponential = calc_exponential(-energy, temperature)
-    print(calculated_exponential)
+    expected_exponent = np.array([[0., 0., 1.], [np.inf, 1., 0.5]])
+    calculated_exponent = calc_exponent(energy, temperature)
 
-    assert pytest.approx(calculated_exponential) == expected_exponential
+    assert pytest.approx(calculated_exponent) == expected_exponent
