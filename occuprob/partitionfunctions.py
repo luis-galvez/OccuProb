@@ -26,7 +26,11 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from occuprob.utils import calc_geometric_mean, calc_exponential
+from occuprob.utils import calc_beta
+from occuprob.utils import calc_exponential
+from occuprob.utils import calc_coth
+from occuprob.utils import calc_csch
+from occuprob.utils import calc_geometric_mean
 
 # Planck's constant in eV/THz
 H = 4.135667696e-3
@@ -66,8 +70,8 @@ class PartitionFunction(ABC):
     def calc_part_func_w(self, temperature):
         """
         Abstract method to calculate the derivative of the partition function
-        with respect to Beta divided by the partition function (W), in the given
-        temperature range.
+        with respect to Beta divided by the partition function (W) multiplied
+        by Beta.
 
         Parameters
         ----------
@@ -83,29 +87,10 @@ class PartitionFunction(ABC):
         """
 
     @abstractmethod
-    def calc_part_func_w2(self, temperature):
-        """
-        Abstract method to calculate the second derivative of the partition
-        function with respect to Beta divided by the partition function (W2), in
-        the given temperature range.
-
-        Parameters
-        ----------
-        temperature : :obj:`numpy.ndarray`
-            A 1D array of size M containing the temperature values in K.
-
-        Returns
-        -------
-        part_func_w2: :obj:`numpy.ndarray`
-            A 2D array of shape (N, M) contaning the calculated second derivative
-            of the partition functions for each of the N isomers, in the given
-            temperature range.
-        """
-
     def calc_part_func_v(self, temperature):
         """
-        Abstract method to calculate the derivative of W with respect to Beta
-        divided by the partition function (V), in the given temperature range.
+        Abstract method to calculate the derivative of W with respect to Beta (V)
+        multiplied by Beta squared.
 
         Parameters
         ----------
@@ -118,12 +103,6 @@ class PartitionFunction(ABC):
             A 2D array of shape (N, M) contaning the calculated derivatives
             of W for each of the N isomers, in the given temperature range.
         """
-
-        part_func_w = self.calc_part_func_w(temperature)
-        part_func_w2 = self.calc_part_func_w2(temperature)
-        part_func_v = part_func_w2 - part_func_w**2
-
-        return part_func_v
 
 
 class ElectronicPF(PartitionFunction):
@@ -164,9 +143,9 @@ class ElectronicPF(PartitionFunction):
         -------
         partition_function: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated partition
-            functions for each of the N isomersin the given temperature range.
+            functions for each of the N isomers in the given temperature range.
         """
-        partition_function = calc_exponential(self.relative_energy,
+        partition_function = calc_exponential(-self.relative_energy,
                                               temperature)
         partition_function *= self.spin_multiplicity[:, None]
 
@@ -174,9 +153,8 @@ class ElectronicPF(PartitionFunction):
 
     def calc_part_func_w(self, temperature):
         """
-        Abstract method to calculate the derivative of the partition function
-        with respect to Beta divided by the partition function (W), in the given
-        temperature range.
+        Method to calculate the derivative of the partition function
+        with respect to Beta divided by the partition function (W).
 
         Parameters
         ----------
@@ -190,15 +168,18 @@ class ElectronicPF(PartitionFunction):
             of the partition function for each of the N isomers, in the given
             temperature range.
         """
-        part_func_w = -np.ones_like(temperature) * self.potential_energy[:, None]
+        beta = calc_beta(temperature)
+        part_func_w = -np.multiply(beta, self.relative_energy[:, None],
+                                   where=self.relative_energy[:, None] != 0.,
+                                   out=np.zeros([self.relative_energy.size,
+                                                 beta.size]))
 
         return part_func_w
 
-    def calc_part_func_w2(self, temperature):
+    def calc_part_func_v(self, temperature):
         """
-        Abstract method to calculate the second derivative of the partition
-        function with respect to Beta divided by the partition function (W2), in
-        the given temperature range.
+        Method to calculate the derivative of W with respect to Beta (V)
+        multiplied by Beta squared.
 
         Parameters
         ----------
@@ -207,14 +188,14 @@ class ElectronicPF(PartitionFunction):
 
         Returns
         -------
-        part_func_w2: :obj:`numpy.ndarray`
-            A 2D array of shape (N, M) contaning the calculated second derivative
-            of the partition functions for each of the N isomers, in the given
-            temperature range.
+        part_func_v: :obj:`numpy.ndarray`
+            A 2D array of shape (N, M) contaning the calculated derivatives
+            of W for each of the N isomers, in the given temperature range.
         """
-        part_func_w2 = self.calc_part_func_w(temperature)**2
 
-        return part_func_w2
+        part_func_v = np.zeros_like(self.calc_part_func_w(temperature))
+
+        return part_func_v
 
 
 class RotationalPF(PartitionFunction):
@@ -255,7 +236,7 @@ class RotationalPF(PartitionFunction):
         -------
         partition_function: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated partition
-            functions for each of the N isomersin the given temperature range.
+            functions for each of the N isomers in the given temperature range.
         """
         moments_product = np.prod(self.moments, axis=1)[:, None]
         partition_function = moments_product * np.ones_like(temperature)
@@ -265,9 +246,8 @@ class RotationalPF(PartitionFunction):
 
     def calc_part_func_w(self, temperature):
         """
-        Abstract method to calculate the derivative of the partition function
-        with respect to Beta divided by the partition function (W), in the given
-        temperature range.
+        Method to calculate the derivative of the partition function
+        with respect to Beta divided by the partition function (W).
 
         Parameters
         ----------
@@ -281,14 +261,15 @@ class RotationalPF(PartitionFunction):
             of the partition function for each of the N isomers, in the given
             temperature range.
         """
+        part_func_w = -1.5 * np.ones([self.symmetry_order.size,
+                                      temperature.size])
 
-        return None
+        return part_func_w
 
-    def calc_part_func_w2(self, temperature):
+    def calc_part_func_v(self, temperature):
         """
-        Abstract method to calculate the second derivative of the partition
-        function with respect to Beta divided by the partition function (W2), in
-        the given temperature range.
+        Method to calculate the derivative of W with respect to Beta (V)
+        multiplied by Beta squared.
 
         Parameters
         ----------
@@ -297,13 +278,13 @@ class RotationalPF(PartitionFunction):
 
         Returns
         -------
-        part_func_w2: :obj:`numpy.ndarray`
-            A 2D array of shape (N, M) contaning the calculated second derivative
-            of the partition functions for each of the N isomers, in the given
-            temperature range.
+        part_func_v: :obj:`numpy.ndarray`
+            A 2D array of shape (N, M) contaning the calculated derivatives
+            of W for each of the N isomers, in the given temperature range.
         """
+        part_func_v = -self.calc_part_func_w(temperature)
 
-        return None
+        return part_func_v
 
 
 class ClassicalHarmonicPF(PartitionFunction):
@@ -341,7 +322,7 @@ class ClassicalHarmonicPF(PartitionFunction):
         -------
         partition_function: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated partition
-            functions for each of the N isomersin the given temperature range.
+            functions for each of the N isomers in the given temperature range.
         """
 
         frequencies_gmean = calc_geometric_mean(self.frequencies)
@@ -353,9 +334,8 @@ class ClassicalHarmonicPF(PartitionFunction):
 
     def calc_part_func_w(self, temperature):
         """
-        Abstract method to calculate the derivative of the partition function
-        with respect to Beta divided by the partition function (W), in the given
-        temperature range.
+        Method to calculate the derivative of the partition function
+        with respect to Beta divided by the partition function (W).
 
         Parameters
         ----------
@@ -369,14 +349,15 @@ class ClassicalHarmonicPF(PartitionFunction):
             of the partition function for each of the N isomers, in the given
             temperature range.
         """
+        part_func_w = -self.n_vib * np.ones([self.frequencies.shape[0],
+                                             temperature.size])
 
-        return None
+        return part_func_w
 
-    def calc_part_func_w2(self, temperature):
+    def calc_part_func_v(self, temperature):
         """
-        Abstract method to calculate the second derivative of the partition
-        function with respect to Beta divided by the partition function (W2), in
-        the given temperature range.
+        Method to calculate the derivative of W with respect to Beta (V)
+        multiplied by Beta squared.
 
         Parameters
         ----------
@@ -385,13 +366,13 @@ class ClassicalHarmonicPF(PartitionFunction):
 
         Returns
         -------
-        part_func_w2: :obj:`numpy.ndarray`
-            A 2D array of shape (N, M) contaning the calculated second derivative
-            of the partition functions for each of the N isomers, in the given
-            temperature range.
+        part_func_v: :obj:`numpy.ndarray`
+            A 2D array of shape (N, M) contaning the calculated derivatives
+            of W for each of the N isomers, in the given temperature range.
         """
+        part_func_v = -self.calc_part_func_w(temperature)
 
-        return None
+        return part_func_v
 
 
 class QuantumHarmonicPF(PartitionFunction):
@@ -428,21 +409,18 @@ class QuantumHarmonicPF(PartitionFunction):
         -------
         partition_function: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated partition
-            functions for each of the N isomersin the given temperature range.
+            functions for each of the N isomers in the given temperature range.
         """
-        exponential = calc_exponential(0.5 * H * self.frequencies[:, :, None],
-                                       temperature)
-        partition_function = np.prod(exponential / (1. - exponential**2),
-                                     where=temperature > 0, axis=1,
-                                     out=np.prod(exponential, axis=1))
+        csch = calc_csch(-0.5 * H * self.frequencies[:, :, None], temperature,
+                         temp_zero=1.)
+        partition_function = np.prod(csch, axis=1)
 
         return partition_function
 
     def calc_part_func_w(self, temperature):
         """
-        Abstract method to calculate the derivative of the partition function
-        with respect to Beta divided by the partition function (W), in the given
-        temperature range.
+        Method to calculate the derivative of the partition function
+        with respect to Beta divided by the partition function (W).
 
         Parameters
         ----------
@@ -456,14 +434,19 @@ class QuantumHarmonicPF(PartitionFunction):
             of the partition function for each of the N isomers, in the given
             temperature range.
         """
+        beta = calc_beta(temperature)
+        coth = calc_coth(H * self.frequencies[:, :, None], temperature)
 
-        return None
+        aux_w = -0.5 * H * np.sum(self.frequencies[:, :, None] * coth, axis=1)
+        part_func_w = np.multiply(beta**2, aux_w, where=temperature > 0,
+                                  out=np.zeros_like(aux_w))
 
-    def calc_part_func_w2(self, temperature):
+        return part_func_w
+
+    def calc_part_func_v(self, temperature):
         """
-        Abstract method to calculate the second derivative of the partition
-        function with respect to Beta divided by the partition function (W2), in
-        the given temperature range.
+        Method to calculate the derivative of W with respect to Beta (V)
+        multiplied by Beta squared.
 
         Parameters
         ----------
@@ -472,10 +455,15 @@ class QuantumHarmonicPF(PartitionFunction):
 
         Returns
         -------
-        part_func_w2: :obj:`numpy.ndarray`
-            A 2D array of shape (N, M) contaning the calculated second derivative
-            of the partition functions for each of the N isomers, in the given
-            temperature range.
+        part_func_v: :obj:`numpy.ndarray`
+            A 2D array of shape (N, M) contaning the calculated derivatives
+            of W for each of the N isomers, in the given temperature range.
         """
+        beta = calc_beta(temperature)
+        csch = calc_csch(-0.5 * H * self.frequencies[:, :, None], temperature)
 
-        return None
+        aux_v = np.sum((H * self.frequencies[:, :, None] * csch)**2, axis=1)
+        part_func_v = np.multiply(beta**2, aux_v, where=temperature > 0,
+                                  out=np.zeros_like(aux_v))
+
+        return part_func_v

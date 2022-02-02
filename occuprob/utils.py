@@ -50,7 +50,7 @@ def calc_beta(temperature):
 
 def calc_exponential(energy, temperature):
     """
-    Calculates the exponential of the form exp(-energy/(KB*temperature)) for
+    Calculates the exponential of the form exp(energy/(KB*temperature)) for
     the given energy and temperature arrays.
 
     Parameters
@@ -70,10 +70,62 @@ def calc_exponential(energy, temperature):
 
     beta = calc_beta(temperature)[None, :]
     output = np.multiply(np.zeros_like(energy), np.zeros_like(beta))
-    exponent = np.multiply(energy, beta, where=energy > 0, out=output)
-    exponential = np.exp(-exponent)
+    exponent = np.multiply(energy, beta, where=energy != 0, out=output)
+    exponential = np.exp(exponent)
 
     return exponential
+
+
+def calc_coth(energy, temperature):
+    """
+    Calculates the hyperbolic cotangent of (energy/(KB*temperature)) for
+    the given energy and temperature arrays.
+
+    Parameters
+    ----------
+    energy : :obj:`numpy.ndarray`
+        A 1D array of size N containing the energy values in eV.
+    temperature : :obj:`numpy.ndarray`
+        A 1D array of size M containing the temperature values in K.
+
+    Returns
+    -------
+    exponential : :obj:`numpy.ndarray`
+        Calculated hyperbolic cotangent stored in a 2D array of shape (N, M)
+    """
+    exponential = calc_exponential(energy, temperature)
+
+    output = np.multiply(np.ones_like(energy),
+                         np.ones_like(temperature[None, :]))
+    coth = np.divide(exponential + 1., exponential - 1.,
+                     where=temperature > 0, out=output)
+
+    return coth
+
+
+def calc_csch(energy, temperature, temp_zero=0.):
+    """
+    Calculates the hyperbolic cosecant of (energy/(KB*temperature)) for
+    the given energy and temperature arrays.
+
+    Parameters
+    ----------
+    energy : :obj:`numpy.ndarray`
+        A 1D array of size N containing the energy values in eV.
+    temperature : :obj:`numpy.ndarray`
+        A 1D array of size M containing the temperature values in K.
+
+    Returns
+    -------
+    exponential : :obj:`numpy.ndarray`
+        Calculated hyperbolic cosecant stored in a 2D array of shape (N, M)
+    """
+    exponential = calc_exponential(-energy, temperature)
+
+    csch = np.divide(exponential, 1. - exponential**2, where=temperature > 0,
+                     out=temp_zero * np.ones_like(exponential))
+
+    return csch
 
 
 def calc_geometric_mean(in_array):
@@ -95,3 +147,8 @@ def calc_geometric_mean(in_array):
                                     axis=1))
 
     return geometric_mean
+
+
+def calc_contributions():
+    """ Calculate contributions PENDIENTE """
+    return None

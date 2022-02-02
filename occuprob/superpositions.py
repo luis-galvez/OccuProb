@@ -115,13 +115,14 @@ class SuperpositionApproximation():
         temperature : :obj:`numpy.ndarray`
             A 1D array of size M containing the temperature values in K.
         observable : :obj:`numpy.ndarray`
-            A 1D array of size N containing the input observable.
+            A 2D array of shape (N, M) containing the input observable values for
+            each isomes as a function of the temperature.
 
         Returns
         -------
         ensemble_average : :obj:`numpy.ndarray`
             A 1D array of shape M containing the ensemble average of the input
-            observable at every temperature provided.
+            observable at the given temperature range.
         """
 
         # The ensemble average of a given observable is calculated as a
@@ -132,7 +133,11 @@ class SuperpositionApproximation():
         if probability is None:
             return None
 
-        ensemble_average = np.sum(observable[:, None] * probability, axis=0)
+        weighted_observable = np.multiply(observable, probability,
+                                          where=probability > 0,
+                                          out=np.zeros((observable.shape[0],
+                                                        temperature.size)))
+        ensemble_average = np.sum(weighted_observable, axis=0)
 
         return ensemble_average
 
@@ -151,6 +156,17 @@ class SuperpositionApproximation():
             A 1D array of shape M containing the heat capacity of the system.
         """
 
-        heat_capacity = self.calc_ensemble_average(temperature, np.zeros((1,)))
+        part_func_w = [partition_function.calc_part_func_w(temperature) for
+                       partition_function in self.partition_functions]
+
+        part_func_v = [partition_function.calc_part_func_v(temperature) for
+                       partition_function in self.partition_functions]
+
+        contribution_w = np.sum(np.stack(part_func_w), axis=0)
+        contribution_v = np.sum(np.stack(part_func_v), axis=0)
+
+        heat_capacity = (self.calc_ensemble_average(temperature, contribution_v) +
+                         self.calc_ensemble_average(temperature, contribution_w**2) -
+                         self.calc_ensemble_average(temperature, contribution_w)**2)
 
         return heat_capacity
