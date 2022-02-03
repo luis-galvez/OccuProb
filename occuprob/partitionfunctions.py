@@ -61,7 +61,7 @@ class PartitionFunction(ABC):
         -------
         partition_function: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated partition
-            functions for each of the N isomers in the given temperature range.
+            functions for each of the N minima in the given temperature range.
         """
 
     @abstractmethod
@@ -80,7 +80,7 @@ class PartitionFunction(ABC):
         -------
         part_func_w: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated derivatives
-            of the partition function for each of the N isomers, in the given
+            of the partition function for each of the N minima, in the given
             temperature range.
         """
 
@@ -99,7 +99,7 @@ class PartitionFunction(ABC):
         -------
         part_func_v: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated derivatives
-            of W for each of the N isomers, in the given temperature range.
+            of W for each of the N minima, in the given temperature range.
         """
 
 
@@ -109,10 +109,10 @@ class ElectronicPF(PartitionFunction):
 
     ...
     potential_energy : :obj:`numpy.ndarray`
-        A 1D array containing the energy values (in eV) of each of the N isomers.
+        A 1D array containing the energy values (in eV) of each of the N minima.
     spin_multiplicity : :obj:`numpy.ndarray`
         A 1D array containing the spin multiplicity corresponding to each of
-        the N isomers.
+        the N minima.
 
     Methods
     -------
@@ -141,7 +141,7 @@ class ElectronicPF(PartitionFunction):
         -------
         partition_function: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated partition
-            functions for each of the N isomers in the given temperature range.
+            functions for each of the N minima in the given temperature range.
         """
         exponent = calc_exponent(self.relative_energy, temperature)
         partition_function = np.exp(-exponent)
@@ -163,7 +163,7 @@ class ElectronicPF(PartitionFunction):
         -------
         part_func_w: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated derivatives
-            of the partition function for each of the N isomers, in the given
+            of the partition function for each of the N minima, in the given
             temperature range.
         """
         beta = calc_beta(temperature)
@@ -188,7 +188,7 @@ class ElectronicPF(PartitionFunction):
         -------
         part_func_v: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated derivatives
-            of W for each of the N isomers, in the given temperature range.
+            of W for each of the N minima, in the given temperature range.
         """
 
         part_func_v = np.zeros_like(self.calc_part_func_w(temperature))
@@ -204,10 +204,10 @@ class RotationalPF(PartitionFunction):
     ...
     symmetry_order : :obj:`numpy.ndarray`
         A 1D array of size N containing the order of rotational subgroup of the
-        point group symmetry of each isomer.
+        point group symmetry of each minimum.
     moments : :obj:`numpy.ndarray`
         A 2D array of shape (N, 3) containing the principal moments of inertia
-        of each isomer.
+        of each minimum.
 
     Methods
     -------
@@ -234,7 +234,7 @@ class RotationalPF(PartitionFunction):
         -------
         partition_function: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated partition
-            functions for each of the N isomers in the given temperature range.
+            functions for each of the N minima in the given temperature range.
         """
         moments_product = np.prod(self.moments, axis=1)[:, None]
         partition_function = moments_product * np.ones_like(temperature)
@@ -256,7 +256,7 @@ class RotationalPF(PartitionFunction):
         -------
         part_func_w: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated derivatives
-            of the partition function for each of the N isomers, in the given
+            of the partition function for each of the N minima, in the given
             temperature range.
         """
         part_func_w = -1.5 * np.ones([self.symmetry_order.size,
@@ -278,7 +278,7 @@ class RotationalPF(PartitionFunction):
         -------
         part_func_v: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated derivatives
-            of W for each of the N isomers, in the given temperature range.
+            of W for each of the N minima, in the given temperature range.
         """
         part_func_v = -self.calc_part_func_w(temperature)
 
@@ -293,7 +293,7 @@ class ClassicalHarmonicPF(PartitionFunction):
     ...
     frequencies : :obj:`numpy.ndarray`
         A 2D array of shape (N, D) containing the D frequency values (in THz) of
-        each of the N isomers.
+        each of the N minima.
 
     Methods
     -------
@@ -320,7 +320,7 @@ class ClassicalHarmonicPF(PartitionFunction):
         -------
         partition_function: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated partition
-            functions for each of the N isomers in the given temperature range.
+            functions for each of the N minima in the given temperature range.
         """
 
         frequencies_gmean = calc_geometric_mean(self.frequencies)
@@ -344,7 +344,7 @@ class ClassicalHarmonicPF(PartitionFunction):
         -------
         part_func_w: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated derivatives
-            of the partition function for each of the N isomers, in the given
+            of the partition function for each of the N minima, in the given
             temperature range.
         """
         part_func_w = -self.n_vib * np.ones([self.frequencies.shape[0],
@@ -366,7 +366,7 @@ class ClassicalHarmonicPF(PartitionFunction):
         -------
         part_func_v: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated derivatives
-            of W for each of the N isomers, in the given temperature range.
+            of W for each of the N minima, in the given temperature range.
         """
         part_func_v = -self.calc_part_func_w(temperature)
 
@@ -381,7 +381,7 @@ class QuantumHarmonicPF(PartitionFunction):
     ...
     frequencies : :obj:`numpy.ndarray`
         A 2D array of shape (N, D) containing the D frequency values (in THz) of
-        each of the N isomers.
+        each of the N minima.
 
     Methods
     -------
@@ -407,7 +407,7 @@ class QuantumHarmonicPF(PartitionFunction):
         -------
         partition_function: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated partition
-            functions for each of the N isomers in the given temperature range.
+            functions for each of the N minima in the given temperature range.
         """
         exponent = calc_exponent(0.5 * H * self.frequencies[:, :, None],
                                  temperature)
@@ -431,7 +431,7 @@ class QuantumHarmonicPF(PartitionFunction):
         -------
         part_func_w: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated derivatives
-            of the partition function for each of the N isomers, in the given
+            of the partition function for each of the N minima, in the given
             temperature range.
         """
         beta = calc_beta(temperature)
@@ -459,7 +459,7 @@ class QuantumHarmonicPF(PartitionFunction):
         -------
         part_func_v: :obj:`numpy.ndarray`
             A 2D array of shape (N, M) contaning the calculated derivatives
-            of W for each of the N isomers, in the given temperature range.
+            of W for each of the N minima, in the given temperature range.
         """
         beta = calc_beta(temperature)
         exponent = calc_exponent(0.5 * H * self.frequencies[:, :, None],
