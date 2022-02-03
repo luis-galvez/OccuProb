@@ -33,9 +33,11 @@ class SuperpositionApproximation():
 
     Methods
     -------
+    combine_contributions(temperature, method, combiner):
+        Calculates and combines the contributions of each degree of freedom
+        to the partition functions or their derivatives with respect to Beta
     calc_partition_functions(temperature):
-        Calculates the individual partition function contributions of each
-        geometrically unique isomer
+        Calculates the partition function of each local minimum considered.
     calc_probability(temperature):
         Calculates the occupation probability in the temperature range provided.
     calc_ensemble_average(temperature, observable):
@@ -46,11 +48,41 @@ class SuperpositionApproximation():
     """
 
     def __init__(self):
-        self.partition_functions = []
+        self.partition_functions = []  # Degrees of freedom to consider
+
+    def combine_contributions(self, temperature, method, combiner):
+        """ Calculates and combines the contributions of each degree of freedom
+        to the partition functions or their derivatives with respect to Beta.
+
+        Parameters
+        ----------
+        temperature : :obj:`numpy.ndarray`
+            A 1D array of size M containing the temperature values in K.
+        method: string
+            Name of the PartitionFunction class method used to compute the
+            individual contributions ("calc_func", "calc_func_w", "calc_func_v")
+        combiner: callable
+            Function used to combine the individual contributions. Can be either
+            Numpy.sum or Numpy.prod.
+
+        Returns
+        -------
+        combined_functions : :obj:`numpy.ndarray`
+            A 2D array of shape (N, M) containing the combined contributions for
+            each of the N minima.
+        """
+        if not self.partition_functions:
+            print("You must include at least one partition function.")
+            return None
+
+        contributions = [getattr(partition_function, method)(temperature) for
+                         partition_function in self.partition_functions]
+        combined_contributions = combiner(np.stack(contributions), axis=0)
+
+        return combined_contributions
 
     def calc_partition_functions(self, temperature):
-        """ Calculates the individual partition functions of each geometrically
-        unique isomer.
+        """ Calculates the partition functions of each local minimum considered.
 
         Parameters
         ----------
@@ -63,13 +95,9 @@ class SuperpositionApproximation():
             A 2D array of shape (N, M) containing the individual partition
             function contributions of each of the N minima.
         """
-        if not self.partition_functions:
-            print("You must include at least one partition function.")
-            return None
-
-        contributions = [partition_function.calc_part_func(temperature) for
-                         partition_function in self.partition_functions]
-        partition_functions = np.prod(np.stack(contributions), axis=0)
+        partition_functions = self.combine_contributions(temperature,
+                                                         "calc_part_func",
+                                                         np.prod)
 
         return partition_functions
 
@@ -95,12 +123,12 @@ class SuperpositionApproximation():
             return None
 
         # The total partition function is the sum of all the individual
-        # contributions of each geometrically unique isomer
+        # contributions of each local minimum considered
         total_partition_function = np.sum(partition_functions, axis=0)
 
-        # The probability of finding the system in some isomer is calculated
-        # as the quotient of its individual partition function divided by the
-        # total partition function
+        # The probability of finding the system in each local minimum is
+        # calculated by dividing their individual contributions by the total
+        # partition function
         occupation_probability = partition_functions / total_partition_function
 
         return occupation_probability
@@ -116,7 +144,7 @@ class SuperpositionApproximation():
             A 1D array of size M containing the temperature values in K.
         observable : :obj:`numpy.ndarray`
             A 2D array of shape (N, M) containing the input observable values for
-            each isomes as a function of the temperature.
+            each local minimum as a function of the temperature.
 
         Returns
         -------
@@ -126,7 +154,7 @@ class SuperpositionApproximation():
         """
 
         # The ensemble average of a given observable is calculated as a
-        # weighted sum using the occupation probabilities of each unique isomer
+        # weighted sum using the occupation probabilities of each local minimum
         # as the weights
         probability = self.calc_probability(temperature)
 
@@ -155,18 +183,13 @@ class SuperpositionApproximation():
         heat_capacity : :obj:`numpy.ndarray`
             A 1D array of shape M containing the heat capacity of the system.
         """
+        part_func_w = self.combine_contributions(temperature, "calc_part_func_w",
+                                                 np.sum)
+        part_func_v = self.combine_contributions(temperature, "calc_part_func_v",
+                                                 np.sum)
 
-        part_func_w = [partition_function.calc_part_func_w(temperature) for
-                       partition_function in self.partition_functions]
-
-        part_func_v = [partition_function.calc_part_func_v(temperature) for
-                       partition_function in self.partition_functions]
-
-        contribution_w = np.sum(np.stack(part_func_w), axis=0)
-        contribution_v = np.sum(np.stack(part_func_v), axis=0)
-
-        heat_capacity = (self.calc_ensemble_average(temperature, contribution_v) +
-                         self.calc_ensemble_average(temperature, contribution_w**2) -
-                         self.calc_ensemble_average(temperature, contribution_w)**2)
+        heat_capacity = (self.calc_ensemble_average(temperature, part_func_v) +
+                         self.calc_ensemble_average(temperature, part_func_w**2) -
+                         self.calc_ensemble_average(temperature, part_func_w)**2)
 
         return heat_capacity
