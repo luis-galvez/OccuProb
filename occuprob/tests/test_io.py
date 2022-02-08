@@ -13,7 +13,7 @@ def test_load_properties_from_extxyz():
     """ Test loading properties from Extended XYZ files."""
 
     expected_properties = {'Energies': np.zeros((2,)),
-                           'Spin multiplicity': np.ones((2,)),
+                           'Spin multiplicity': 2. * np.ones((2,)),
                            'Frequencies': np.ones((2, 3)),
                            'Moments of inertia': np.array([[0., 2.016, 2.016],
                                                            [1.008, 1.008, 2.016]]),
