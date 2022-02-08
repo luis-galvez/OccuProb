@@ -1,0 +1,10 @@
+3
+energy=0.0 multiplicity=1 frequencies="1.0 1.0 1.0"
+H -1.0 0.0 0.0
+H  0.0 0.0 0.0
+H  1.0 0.0 0.0
+3
+energy=0.0 multiplicity=1 frequencies="1.0 1.0 1.0"
+H  1.0 0.0 0.0
+H  0.0 1.0 0.0
+H  0.0 0.0 1.0

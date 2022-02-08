@@ -1,10 +1,11 @@
-"""Tool to calculate thermodynamic properties using the superposition approximation of the PES."""
+"""A tool to calculate thermodynamic properties via the superposition approximation."""
 
 # Add imports here
 from .occuprob import *
 from .partitionfunctions import *
 from .superpositions import *
 from .utils import *
+from .io import *
 
 # Handle versioneer
 from ._version import get_versions
