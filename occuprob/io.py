@@ -26,7 +26,7 @@ import numpy as np
 
 from ase.io import read
 
-from pymatgen.io.ase import AseAtomsAdaptor
+from pymatgen.core.structure import Molecule
 from pymatgen.symmetry.analyzer import PointGroupAnalyzer
 
 
@@ -36,16 +36,20 @@ def calc_symmetry_order(ase_atoms):
 
     Parameters
     ----------
-    ase_atoms : :obj:`ase.atoms`
-        PENDIENTE.
+    ase_atoms : :obj:`ASE Atoms object`
+        Input ASE Atoms object containing the molecule to analyze.
 
     Returns
     -------
-    symmetry_order : :obj:`numpy.ndarray`
-        PENDIENTE.
+    symmetry_order : float
+        Order of the rotational subgroup of the symmetry point group of the
+        input molecule.
     """
 
-    molecule = AseAtomsAdaptor.get_molecule(ase_atoms)
+    symbols = ase_atoms.get_chemical_symbols()
+    positions = ase_atoms.get_positions()
+
+    molecule = Molecule(symbols, positions)
     point_group = PointGroupAnalyzer(molecule, eigen_tolerance=0.01)
 
     symmetry_matrices = np.array([matrix.as_dict()['matrix'] for matrix in
