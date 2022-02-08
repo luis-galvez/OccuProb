@@ -9,6 +9,7 @@ import numpy as np
 from occuprob.utils import calc_beta
 from occuprob.utils import calc_geometric_mean
 from occuprob.utils import calc_exponent
+from occuprob.utils import compare_numpy_dictionaries
 
 
 def test_calc_beta():
@@ -45,3 +46,16 @@ def test_calc_exponent():
     calculated_exponent = calc_exponent(energy, temperature)
 
     assert pytest.approx(calculated_exponent) == expected_exponent
+
+
+def test_compare_numpy_dictionaries():
+    """ Unit test for the compare_numpy_dictionaries function. """
+
+    dict1 = {1: np.zeros((2, 2)), 2: np.ones((2, 2))}
+    dict2 = {1: np.zeros((2, 2)), 2: np.ones((2, 2))}
+    dict3 = {1: np.ones((2, 2)), 2: np.zeros((2, 2))}
+    dict4 = {0: np.ones((2, 2)), 1: np.zeros((2, 2))}
+
+    assert compare_numpy_dictionaries(dict1, dict2)
+    assert not compare_numpy_dictionaries(dict1, dict3)
+    assert not compare_numpy_dictionaries(dict3, dict4)

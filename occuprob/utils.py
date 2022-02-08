@@ -1,4 +1,4 @@
-""" Miscellaneous functions. """
+""" Utility functions. """
 
 # MIT License
 
@@ -99,3 +99,13 @@ def calc_geometric_mean(in_array):
 def calc_contributions():
     """ Calculate contributions PENDIENTE """
     return None
+
+
+def compare_numpy_dictionaries(dict1, dict2):
+    """ Checks if two dictionaries containing numpy arrays as values are equal.
+    """
+
+    if dict1.keys() != dict2.keys():
+        return False
+
+    return all(np.allclose(dict1[key], dict2[key]) for key in dict1)
