@@ -1,13 +1,13 @@
 """
 OccuProb
-Tool to calculate thermodynamic properties using the superposition approximation of the PES.
+A tool to calculate thermodynamic properties via the superposition approximation.
 """
 import sys
 from setuptools import setup, find_packages
 import versioneer
 
-short_description = "Tool to calculate thermodynamic properties using the" +\
-                    "superposition approximation of the PES.".split("\n")[0]
+short_description = "A tool to calculate thermodynamic properties via the" +\
+                    "superposition approximation.".split("\n")[0]
 
 # from https://github.com/pytest-dev/pytest-runner#conditional-requirement
 needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
@@ -47,7 +47,7 @@ setup(
 
     # Additional entries you may want simply uncomment the lines you want and fill in the data
     # url='http://www.my_package.com',  # Website
-    install_requires=['numpy'],
+    install_requires=['numpy', 'ase', 'pymatgen', 'matplotlib'],
     platforms=['Linux',
                'Mac OS-X',
                'Unix',
