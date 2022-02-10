@@ -29,6 +29,8 @@ from ase.io import read
 from pymatgen.core.structure import Molecule
 from pymatgen.symmetry.analyzer import PointGroupAnalyzer
 
+import matplotlib.pyplot as plt
+
 
 def calc_symmetry_order(ase_atoms):
     """ Calculates the order of the rotational subgroup of the symmetry point
@@ -93,10 +95,47 @@ def load_properties_from_extxyz(xyz_filename):
         moments_of_inertia.append(atoms.get_moments_of_inertia())
         symmetry_order.append(calc_symmetry_order(atoms))
 
-    properties = {'Energies': np.stack(energies),
-                  'Spin multiplicity': np.stack(spin_multiplicity),
-                  'Frequencies': np.stack(frequencies),
-                  'Moments of inertia': np.stack(moments_of_inertia),
-                  'Symmetry order': np.stack(symmetry_order)}
+    properties = {'energy': np.stack(energies),
+                  'multiplicity': np.stack(spin_multiplicity),
+                  'frequencies': np.stack(frequencies).astype(np.longdouble),
+                  'moments': np.stack(moments_of_inertia),
+                  'symmetry': np.stack(symmetry_order)}
 
     return properties
+
+
+def plot_results(results, temperature, outfile, size, result_type):
+    """ Plot results. """
+
+    if result_type.lower() == 'probability' or result_type.lower() == 'p':
+        labels = ['ISO' + str(i) for i in range(len(results))]
+        hline_positions = [0, 1]
+        ymin, ymax = -0.05, 1.05
+        ylabel = r'Occupation probability, $P_k(T)$'
+    elif result_type.lower() == 'heat_capacity' or result_type.lower() == 'c':
+        labels = [None]
+        hline_positions = []
+        ymin, ymax = 0.0, 5. * np.ceil(results.max() / 5.)
+        ylabel = r'Heat capacity, $C_V/k_B$'
+
+    plt.figure(figsize=size)
+
+    plt.xlabel(r'$T$ [K]')
+    plt.ylabel(ylabel)
+
+    xmin, xmax = temperature[0], temperature[-1]
+
+    for position in hline_positions:
+        plt.hlines(position, xmin, xmax, colors='silver', linestyles='--', lw=2)
+
+    for i, result in enumerate(results):
+        plt.plot(temperature, result, label=labels[i], lw=2)
+
+    plt.xlim((xmin, xmax))
+    plt.ylim((ymin, ymax))
+
+    if labels[0]:
+        plt.legend()
+
+    plt.tight_layout()
+    plt.savefig(outfile)
