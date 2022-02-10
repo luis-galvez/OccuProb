@@ -16,7 +16,7 @@ pytest_runner = ['pytest-runner'] if needs_pytest else []
 try:
     with open("README.md", "r") as handle:
         long_description = handle.read()
-except:
+except IOError:
     long_description = None
 
 
@@ -47,7 +47,10 @@ setup(
 
     # Additional entries you may want simply uncomment the lines you want and fill in the data
     # url='http://www.my_package.com',  # Website
-    install_requires=['numpy', 'ase', 'pymatgen', 'matplotlib'],
+    install_requires=['numpy >= 1.19.0',
+                      'ase >= 3.22.1',
+                      'pymatgen >= 2022.0.17',
+                      'matplotlib >= 3.1.3'],
     platforms=['Linux',
                'Mac OS-X',
                'Unix',
@@ -55,6 +58,11 @@ setup(
     python_requires=">=3.7",          # Python version restrictions
 
     # Manual control if final package is compressible or not, set False to
-    # prevent the .egg from being made zip_safe=False,
+    # prevent the .egg from being made
+    zip_safe=False,
+
+    entry_points={
+        'console_scripts': ['occuprob=occuprob.cli:main']
+    },
 
 )
