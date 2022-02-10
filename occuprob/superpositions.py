@@ -47,10 +47,10 @@ class SuperpositionApproximation():
         Calculates the canonical heat capacity for the given temperature range.
     """
 
-    def __init__(self):
-        self.partition_functions = []  # Degrees of freedom to consider
+    def __init__(self, partition_functions):
+        self.partition_functions = partition_functions
 
-    def combine_contributions(self, temperature, method, combiner):
+    def combine_contributions(self, temperature, combiner, method):
         """ Calculates and combines the contributions of each degree of freedom
         to the partition functions or their derivatives with respect to Beta.
 
@@ -58,12 +58,12 @@ class SuperpositionApproximation():
         ----------
         temperature : :obj:`numpy.ndarray`
             A 1D array of size M containing the temperature values in K.
-        method: string
-            Name of the PartitionFunction class method used to compute the
-            individual contributions ("calc_func", "calc_func_w", "calc_func_v")
         combiner: callable
             Function used to combine the individual contributions. Can be either
             Numpy.sum or Numpy.prod.
+        method: string
+            Name of the PartitionFunction class method used to compute the
+            individual contributions ("calc_func", "calc_func_w", "calc_func_v")
 
         Returns
         -------
@@ -95,9 +95,8 @@ class SuperpositionApproximation():
             A 2D array of shape (N, M) containing the individual partition
             function contributions of each of the N minima.
         """
-        partition_functions = self.combine_contributions(temperature,
-                                                         "calc_part_func",
-                                                         np.prod)
+        partition_functions = self.combine_contributions(temperature, np.prod,
+                                                         "calc_part_func")
 
         return partition_functions
 
@@ -183,13 +182,12 @@ class SuperpositionApproximation():
         heat_capacity : :obj:`numpy.ndarray`
             A 1D array of shape M containing the heat capacity of the system.
         """
-        part_func_w = self.combine_contributions(temperature, "calc_part_func_w",
-                                                 np.sum)
-        part_func_v = self.combine_contributions(temperature, "calc_part_func_v",
-                                                 np.sum)
+        part_func_d = {d: self.combine_contributions(temperature, np.sum,
+                                                     'calc_part_func_' + d)
+                       for d in ['w', 'v']}
 
-        heat_capacity = (self.calc_ensemble_average(temperature, part_func_v) +
-                         self.calc_ensemble_average(temperature, part_func_w**2) -
-                         self.calc_ensemble_average(temperature, part_func_w)**2)
+        heat_capacity = (self.calc_ensemble_average(temperature, part_func_d['v']) +
+                         self.calc_ensemble_average(temperature, part_func_d['w']**2) -
+                         self.calc_ensemble_average(temperature, part_func_d['w'])**2)
 
-        return heat_capacity
+        return heat_capacity.reshape(1, -1)
