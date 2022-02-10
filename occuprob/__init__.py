@@ -1,7 +1,6 @@
 """A tool to calculate thermodynamic properties via the superposition approximation."""
 
 # Add imports here
-from .occuprob import *
 from .partitionfunctions import *
 from .superpositions import *
 from .utils import *
