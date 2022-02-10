@@ -1,4 +1,4 @@
-""" Routines to calculate partition functions. """
+""" Module used to calculate partition functions. """
 
 # MIT License
 
@@ -391,7 +391,9 @@ class QuantumHarmonicPF(PartitionFunction):
     """
 
     def __init__(self, frequencies):
-        self.frequencies = frequencies
+        # Frequencies array is cast to long double type to allow for precise
+        # calculations at low temperatures
+        self.frequencies = frequencies.astype(np.longdouble)
 
     def calc_part_func(self, temperature):
         """
@@ -412,7 +414,7 @@ class QuantumHarmonicPF(PartitionFunction):
         exponent = calc_exponent(0.5 * H * self.frequencies[:, :, None],
                                  temperature)
         csch = 0.5 / np.sinh(exponent, where=temperature > 0,
-                             out=np.ones_like(exponent))
+                             out=2. * np.ones_like(exponent))
         partition_function = np.prod(csch, axis=1)
 
         return partition_function
