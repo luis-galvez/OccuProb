@@ -12,12 +12,12 @@ from occuprob.utils import compare_numpy_dictionaries
 def test_load_properties_from_extxyz():
     """ Test loading properties from Extended XYZ files."""
 
-    expected_properties = {'Energies': np.zeros((2,)),
-                           'Spin multiplicity': 2. * np.ones((2,)),
-                           'Frequencies': np.ones((2, 3)),
-                           'Moments of inertia': np.array([[0., 2.016, 2.016],
-                                                           [1.008, 1.008, 2.016]]),
-                           'Symmetry order': np.array([1, 6])}
+    expected_properties = {'energy': np.zeros((2,)),
+                           'multiplicity': 2. * np.ones((2,)),
+                           'frequencies': np.ones((2, 3)),
+                           'moments': np.array([[0., 2.016, 2.016],
+                                                [1.008, 1.008, 2.016]]),
+                           'symmetry': np.array([1, 6])}
 
     test_file = os.path.dirname(occuprob.__file__) + '/data/test.xyz'
     loaded_properties = load_properties_from_extxyz(test_file)
