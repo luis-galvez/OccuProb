@@ -39,16 +39,16 @@ def main():
     parser = argparse.ArgumentParser(description='OccuProb.')
     electronic = parser.add_mutually_exclusive_group()
     electronic.add_argument('-e', '-E', action='store_true',
-                            help='Electronic partition function')
+                            help='Add electronic partition function')
     electronic.add_argument('-s', '-S', action='store_true',
-                            help='Electronic partition function including spin')
+                            help='Add electronic partition function including spin')
     vibrational = parser.add_mutually_exclusive_group()
     vibrational.add_argument('-c', '-C', action='store_true',
-                             help='Classical harmonic vibrational partition function')
+                             help='Add vibrational partition function (classical harmonic)')
     vibrational.add_argument('-q', '-Q', action='store_true',
-                             help='Quantum harmonic vibrational partition function')
+                             help='Add vibrational partition function (quantum harmonic)')
     parser.add_argument('-r', '-R', action='store_true',
-                        help='Rotational partition function')
+                        help='Add rotational partition function')
     parser.add_argument('input_file', help='Extended XYZ file contaning the list of isomers')
     parser.add_argument('--output', help='Output filename prefix')
     parser.add_argument('--min_temp', type=float, default=0.,
