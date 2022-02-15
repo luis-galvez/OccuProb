@@ -47,7 +47,7 @@ setup(
 
     # Additional entries you may want simply uncomment the lines you want and fill in the data
     # url='http://www.my_package.com',  # Website
-    install_requires=['numpy >= 1.19.0, <1.21.0',
+    install_requires=['numpy >= 1.19.0',
                       'ase >= 3.22.1',
                       'pymatgen >= 2022.0.17',
                       'matplotlib >= 3.1.3'],
