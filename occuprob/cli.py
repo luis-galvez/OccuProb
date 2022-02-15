@@ -43,7 +43,7 @@ def main():
     electronic.add_argument('-s', '-S', action='store_true',
                             help='Electronic partition function including spin')
     vibrational = parser.add_mutually_exclusive_group()
-    vibrational.add_argument('-v', '-V', action='store_true',
+    vibrational.add_argument('-c', '-C', action='store_true',
                              help='Classical harmonic vibrational partition function')
     vibrational.add_argument('-q', '-Q', action='store_true',
                              help='Quantum harmonic vibrational partition function')
