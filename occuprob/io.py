@@ -115,7 +115,7 @@ def plot_results(results, temperature, outfile, size, result_type):
     elif result_type.lower() == 'heat_capacity' or result_type.lower() == 'c':
         labels = [None]
         hline_positions = []
-        ymin, ymax = 0.0, 5. * np.ceil(results.max() / 5.)
+        ymin, ymax = 0.0, 2. * np.ceil(results.max() / 2.)
         ylabel = r'Heat capacity, $C_V/k_B$'
 
     plt.figure(figsize=size)
