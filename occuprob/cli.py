@@ -56,7 +56,7 @@ def main():
     parser.add_argument('--max_temp', type=float, default=500.,
                         help='Maximum temperature in K (default: 500)')
     parser.add_argument('--plot', action='store_true',
-                        help='Plot the results and save them as image files')
+                        help='Plot the results and save them as SVG image files')
     parser.add_argument('--size', type=float, nargs=2, default=[8., 6.],
                         help='Width and height of the output image, in inches (default: 8.0 6.0)')
     args = parser.parse_args()
@@ -80,7 +80,8 @@ def main():
                                                 properties['moments']))
 
     if partition_functions:
-        superposition = SuperpositionApproximation(partition_functions)
+        superposition = SuperpositionApproximation()
+        superposition.add_partition_functions(partition_functions)
 
         temperature = np.arange(args.min_temp, args.max_temp + 1., 1.)
 
@@ -94,7 +95,7 @@ def main():
                 outfile = args.input_file.replace('.xyz', '_' + key)
 
             if args.plot:
-                io.plot_results(results[key], temperature, outfile + '.pdf',
+                io.plot_results(results[key], temperature, outfile + '.svg',
                                 args.size, result_type=key)
 
             outdata = np.vstack((temperature, results[key]))

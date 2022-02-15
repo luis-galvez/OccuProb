@@ -17,7 +17,7 @@ def test_empty_sa():
     """Tests instance of the SuperpositionApproximation class where no
     partition functions are included."""
 
-    electronic_sa = SuperpositionApproximation([])
+    electronic_sa = SuperpositionApproximation()
 
     temperature = np.array([0.])
     heat_capacity = electronic_sa.calc_probability(temperature)
@@ -35,7 +35,8 @@ def test_electronic_only():
     multiplicity = np.ones_like(potential_energy)
 
     partition_functions = [ElectronicPF(potential_energy, multiplicity)]
-    electronic_sa = SuperpositionApproximation(partition_functions)
+    electronic_sa = SuperpositionApproximation()
+    electronic_sa.add_partition_functions(partition_functions)
 
     temperature = np.array([0., np.inf])
     expected_prob = np.array([[1.0, 0.5], [0.0, 0.5]])
@@ -56,7 +57,8 @@ def test_classical_harmonic():
 
     partition_functions = [ElectronicPF(potential_energy, multiplicity),
                            ClassicalHarmonicPF(frequencies)]
-    classical_harmonic_sa = SuperpositionApproximation(partition_functions)
+    classical_harmonic_sa = SuperpositionApproximation()
+    classical_harmonic_sa.add_partition_functions(partition_functions)
 
     temperature = np.array([0., np.inf])
     expected_prob = np.array([[1.0, 0.75], [0.0, 0.25]])
@@ -78,7 +80,8 @@ def test_quantum_harmonic():
 
     partition_functions = [ElectronicPF(potential_energy, multiplicity),
                            QuantumHarmonicPF(frequencies)]
-    quantum_harmonic_sa = SuperpositionApproximation(partition_functions)
+    quantum_harmonic_sa = SuperpositionApproximation()
+    quantum_harmonic_sa.add_partition_functions(partition_functions)
 
     expected_prob = np.array([[1.0, 0.75], [0.0, 0.25]])
     calculated_prob = quantum_harmonic_sa.calc_probability(temperature)
@@ -102,7 +105,8 @@ def test_classical_harmonic_rot():
     partition_functions = [ElectronicPF(potential_energy, multiplicity),
                            ClassicalHarmonicPF(frequencies),
                            RotationalPF(symmetry_order, moments)]
-    classical_harmonic_sa = SuperpositionApproximation(partition_functions)
+    classical_harmonic_sa = SuperpositionApproximation()
+    classical_harmonic_sa.add_partition_functions(partition_functions)
 
     temperature = np.array([0., np.inf])
     expected_prob = np.array([[1.0, 0.6], [0.0, 0.4]])
@@ -128,7 +132,8 @@ def test_quantum_harmonic_rot():
     partition_functions = [ElectronicPF(potential_energy, multiplicity),
                            QuantumHarmonicPF(frequencies),
                            RotationalPF(symmetry_order, moments)]
-    quantum_harmonic_sa = SuperpositionApproximation(partition_functions)
+    quantum_harmonic_sa = SuperpositionApproximation()
+    quantum_harmonic_sa.add_partition_functions(partition_functions)
 
     expected_prob = np.array([[1.0, 0.6], [0.0, 0.4]])
     calculated_prob = quantum_harmonic_sa.calc_probability(temperature)

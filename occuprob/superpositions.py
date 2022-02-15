@@ -33,6 +33,8 @@ class SuperpositionApproximation():
 
     Methods
     -------
+    add_partition_functions(partition_functions):
+        Add partition function contributions.
     combine_contributions(temperature, method, combiner):
         Calculates and combines the contributions of each degree of freedom
         to the partition functions or their derivatives with respect to Beta
@@ -47,8 +49,21 @@ class SuperpositionApproximation():
         Calculates the canonical heat capacity for the given temperature range.
     """
 
-    def __init__(self, partition_functions):
-        self.partition_functions = partition_functions
+    def __init__(self):
+        self.partition_functions = []
+
+    def add_partition_functions(self, partition_functions):
+        """ Add partition function contributions.
+
+        Parameters
+        ----------
+        partition_functions: :obj:`PartitionFunction` or list of :obj:`PartitionFunction`
+            Partition function contribution(s) to add.
+        """
+        try:
+            self.partition_functions.extend(partition_functions)
+        except TypeError:
+            self.partition_functions.append(partition_functions)
 
     def combine_contributions(self, temperature, combiner, method):
         """ Calculates and combines the contributions of each degree of freedom
