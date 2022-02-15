@@ -96,11 +96,6 @@ def calc_geometric_mean(in_array):
     return geometric_mean
 
 
-def calc_contributions():
-    """ Calculate contributions PENDIENTE """
-    return None
-
-
 def compare_numpy_dictionaries(dict1, dict2):
     """ Checks if two dictionaries containing numpy arrays as values are equal.
     """
