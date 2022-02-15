@@ -1,4 +1,5 @@
-"""A tool to calculate thermodynamic properties via the superposition approximation."""
+"""A tool for calculating occupation probabilities and ensemble-averaged
+properties via the superposition approximation."""
 
 # Add imports here
 from .partitionfunctions import *

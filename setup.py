@@ -1,13 +1,14 @@
 """
 OccuProb
-A tool to calculate thermodynamic properties via the superposition approximation.
+A tool for calculating occupation probabilities and ensemble-averaged properties
+via the superposition approximation.
 """
 import sys
 from setuptools import setup, find_packages
 import versioneer
 
-short_description = "A tool to calculate thermodynamic properties via the" +\
-                    "superposition approximation.".split("\n")[0]
+short_description = "A tool for calculating occupation probabilities and " +\
+                    "ensemble-averaged properties via the superposition approximation.".split("\n")[0]
 
 # from https://github.com/pytest-dev/pytest-runner#conditional-requirement
 needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)

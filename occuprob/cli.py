@@ -36,7 +36,10 @@ from occuprob.partitionfunctions import RotationalPF
 
 def main():
     """ Command-line interface """
-    parser = argparse.ArgumentParser(description='OccuProb.')
+    description = 'OccuProb: A tool for calculating occupation probabilities' +\
+                  ' and ensemble-averaged properties via the superposition approximation.'
+
+    parser = argparse.ArgumentParser(description=description)
     electronic = parser.add_mutually_exclusive_group()
     electronic.add_argument('-e', '-E', action='store_true',
                             help='Add electronic partition function')

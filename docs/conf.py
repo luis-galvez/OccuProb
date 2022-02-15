@@ -166,7 +166,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'occuprob', 'OccuProb Documentation',
-     author, 'occuprob', 'Tool to calculate thermodynamic properties using the superposition approximation of the PES.',
+     author, 'occuprob', 'A tool for calculating occupation probabilities and ensemble-averaged properties via the superposition approximation.',
      'Miscellaneous'),
 ]
 
