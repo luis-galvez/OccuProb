@@ -49,12 +49,11 @@ setup(
     # url='http://www.my_package.com',  # Website
     install_requires=['numpy >= 1.19.0, <1.21.0',
                       'ase >= 3.22.1',
-                      'pymatgen == 2022.0.17',
+                      'pymatgen >= 2022.0.17',
                       'matplotlib >= 3.1.3'],
     platforms=['Linux',
                'Mac OS-X',
-               'Unix',
-               'Windows'],            # Valid platforms your code works on, adjust to your flavor
+               'Unix'],            # Valid platforms your code works on, adjust to your flavor
     python_requires=">=3.7",          # Python version restrictions
 
     # Manual control if final package is compressible or not, set False to
