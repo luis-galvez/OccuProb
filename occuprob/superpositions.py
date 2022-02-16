@@ -28,25 +28,6 @@ import numpy as np
 class SuperpositionApproximation():
     """
     Represents a superposition approximation of the PES.
-
-    ...
-
-    Methods
-    -------
-    add_partition_functions(partition_functions):
-        Add partition function contributions.
-    combine_contributions(temperature, method, combiner):
-        Calculates and combines the contributions of each degree of freedom
-        to the partition functions or their derivatives with respect to Beta
-    calc_partition_functions(temperature):
-        Calculates the partition function of each local minimum considered.
-    calc_probability(temperature):
-        Calculates the occupation probability in the temperature range provided.
-    calc_ensemble_average(temperature, observable):
-        Calculates the ensemble average for the given observable in the provided
-        temperature range.
-    calc_heat_capacity(temperature):
-        Calculates the canonical heat capacity for the given temperature range.
     """
 
     def __init__(self):
@@ -86,15 +67,15 @@ class SuperpositionApproximation():
             A 2D array of shape (N, M) containing the combined contributions for
             each of the N minima.
         """
-        if not self.partition_functions:
+        try:
+            contributions = [getattr(partition_function, method)(temperature) for
+                             partition_function in self.partition_functions]
+            combined_contributions = combiner(np.stack(contributions), axis=0)
+
+            return combined_contributions
+
+        except ValueError:
             print("You must include at least one partition function.")
-            return None
-
-        contributions = [getattr(partition_function, method)(temperature) for
-                         partition_function in self.partition_functions]
-        combined_contributions = combiner(np.stack(contributions), axis=0)
-
-        return combined_contributions
 
     def calc_partition_functions(self, temperature):
         """ Calculates the partition functions of each local minimum considered.
@@ -195,7 +176,7 @@ class SuperpositionApproximation():
         Returns
         -------
         heat_capacity : :obj:`numpy.ndarray`
-            A 1D array of shape M containing the heat capacity of the system.
+            A 1D array of size M containing the heat capacity of the system.
         """
         part_func_d = {d: self.combine_contributions(temperature, np.sum,
                                                      'calc_part_func_' + d)

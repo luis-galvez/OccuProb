@@ -37,13 +37,6 @@ H = 4.135667696e-3
 class PartitionFunction(ABC):
     """
     An abstract class that represents a partition function.
-
-    ...
-
-    Methods
-    -------
-    calc_partition_function(temperature):
-        Calculates the partition function in the given temperature range.
     """
 
     @abstractmethod
@@ -107,18 +100,13 @@ class ElectronicPF(PartitionFunction):
     """
     Represents a canonical electronic partition function.
 
-    ...
+    Attributes
+    ----------
     potential_energy : :obj:`numpy.ndarray`
         A 1D array containing the energy values (in eV) of each of the N minima.
     spin_multiplicity : :obj:`numpy.ndarray`
         A 1D array containing the spin multiplicity corresponding to each of
         the N minima.
-
-    Methods
-    -------
-    calc_partition_function(temperature):
-        Calculates the canonical electronic partition function in the given
-        temperature range.
     """
 
     def __init__(self, potential_energy, spin_multiplicity):
@@ -201,19 +189,14 @@ class RotationalPF(PartitionFunction):
     Represents a canonical rotational  partition function in a high-temperature
     approximation.
 
-    ...
+    Attributes
+    ----------
     symmetry_order : :obj:`numpy.ndarray`
         A 1D array of size N containing the order of rotational subgroup of the
         point group symmetry of each minimum.
     moments : :obj:`numpy.ndarray`
         A 2D array of shape (N, 3) containing the principal moments of inertia
         of each minimum.
-
-    Methods
-    -------
-    calc_partition_function(temperature):
-        Calculates the rotational partition function in the given temperature
-        range.
     """
 
     def __init__(self, symmetry_order, moments):
@@ -290,16 +273,11 @@ class ClassicalHarmonicPF(PartitionFunction):
     Represents a canonical vibrational partition function in the classical
     harmonic approximation.
 
-    ...
+    Attributes
+    ----------
     frequencies : :obj:`numpy.ndarray`
         A 2D array of shape (N, D) containing the D frequency values (in THz) of
         each of the N minima.
-
-    Methods
-    -------
-    calc_partition_function(temperature):
-        Calculates the vibrational partition function in the given
-        temperature range.
     """
 
     def __init__(self, frequencies):
@@ -378,16 +356,11 @@ class QuantumHarmonicPF(PartitionFunction):
     Represents a canonical vibrational partition function in the quantum
     harmonic approximation.
 
-    ...
+    Attributes
+    ----------
     frequencies : :obj:`numpy.ndarray`
         A 2D array of shape (N, D) containing the D frequency values (in THz) of
         each of the N minima.
-
-    Methods
-    -------
-    calc_partition_function(temperature):
-        Calculates the vibrational partition function in the given
-        temperature range.
     """
 
     def __init__(self, frequencies):

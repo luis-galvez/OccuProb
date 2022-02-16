@@ -105,7 +105,22 @@ def load_properties_from_extxyz(xyz_filename):
 
 
 def plot_results(results, temperature, outfile, size, result_type):
-    """ Plot results. """
+    """ Plot results.
+
+    Parameters
+    ----------
+    results : :obj:`numpy.ndarray`
+        .
+    temperature : :obj:`numpy.ndarray`
+        A 1D array of size M containing the temperature values in K.
+    outfile : string
+        Output filename.
+    size : float, float
+        Width and height of the output figure.
+    results_type: string
+        Property to be plotted: 'probability' or 'p' for occupation probability;
+        'heat_capacity' or 'c' for heat capacity.
+    """
 
     if result_type.lower() == 'probability' or result_type.lower() == 'p':
         labels = ['ISO' + str(i) for i in range(len(results))]
