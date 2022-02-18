@@ -64,6 +64,9 @@ class PartitionFunction(ABC):
         with respect to Beta divided by the partition function (W) multiplied
         by Beta.
 
+        .. math::
+            W_k = \\frac{1}{Z_k} \\frac{\\partial Z_k}{\\partial \\beta}
+
         Parameters
         ----------
         temperature : :obj:`numpy.ndarray`
@@ -82,6 +85,9 @@ class PartitionFunction(ABC):
         """
         Abstract method to calculate the derivative of W with respect to Beta (V)
         multiplied by Beta squared.
+
+        .. math::
+            V_k = \\frac{\\partial W_k}{\\partial \\beta}
 
         Parameters
         ----------
@@ -120,6 +126,9 @@ class ElectronicPF(PartitionFunction):
         Calculates the electronic canonical partition function in the given
         temperature range.
 
+        .. math::
+            Z_{elec,k} = g_{k}e^{-\\beta E_k}
+
         Parameters
         ----------
         temperature : :obj:`numpy.ndarray`
@@ -141,6 +150,9 @@ class ElectronicPF(PartitionFunction):
         """
         Method to calculate the derivative of the partition function
         with respect to Beta divided by the partition function (W).
+
+        .. math::
+            \\beta W_{elec,k} = -\\beta E_k
 
         Parameters
         ----------
@@ -166,6 +178,9 @@ class ElectronicPF(PartitionFunction):
         """
         Method to calculate the derivative of W with respect to Beta (V)
         multiplied by Beta squared.
+
+        .. math::
+            \\beta^2 V_{elec,k} = 0
 
         Parameters
         ----------
@@ -208,6 +223,11 @@ class RotationalPF(PartitionFunction):
         Calculates the electronic canonical partition function in the given
         temperature range.
 
+        .. math::
+            Z_{rot,k} = \\frac{\\sqrt{\\pi}}{\\sigma_k}
+                         \\left(\\frac{2}{\\beta\\hbar}\\right)^{\\frac{3}{2}}
+                         \\sqrt{I_{k,1}I_{k,2}I_{k,3}}
+
         Parameters
         ----------
         temperature : :obj:`numpy.ndarray`
@@ -230,6 +250,9 @@ class RotationalPF(PartitionFunction):
         Method to calculate the derivative of the partition function
         with respect to Beta divided by the partition function (W).
 
+        .. math::
+            \\beta W_{rot,k} = -\\frac{3}{2}
+
         Parameters
         ----------
         temperature : :obj:`numpy.ndarray`
@@ -251,6 +274,9 @@ class RotationalPF(PartitionFunction):
         """
         Method to calculate the derivative of W with respect to Beta (V)
         multiplied by Beta squared.
+
+        .. math::
+            \\beta^2 V_{rot,k} = \\frac{3}{2}
 
         Parameters
         ----------
@@ -289,6 +315,9 @@ class ClassicalHarmonicPF(PartitionFunction):
         Calculates the classical vibrational partition function in the given
         temperature range.
 
+        .. math::
+            Z_{vib,k} = \\left(\\beta h \\bar{\\nu}_k\\right)^{-\\kappa}
+
         Parameters
         ----------
         temperature : :obj:`numpy.ndarray`
@@ -313,6 +342,9 @@ class ClassicalHarmonicPF(PartitionFunction):
         Method to calculate the derivative of the partition function
         with respect to Beta divided by the partition function (W).
 
+        .. math::
+            \\beta V_{vib,k} = -\\kappa
+
         Parameters
         ----------
         temperature : :obj:`numpy.ndarray`
@@ -334,6 +366,9 @@ class ClassicalHarmonicPF(PartitionFunction):
         """
         Method to calculate the derivative of W with respect to Beta (V)
         multiplied by Beta squared.
+
+        .. math::
+            \\beta^2 V_{vib,k} = \\kappa
 
         Parameters
         ----------
@@ -373,6 +408,11 @@ class QuantumHarmonicPF(PartitionFunction):
         Calculates the quantum vibrational partition function in the given
         temperature range.
 
+        .. math::
+            Z_{vib,k} = \\prod_{i=1}^{\\kappa}\\frac{e^{-\\beta h\\nu_{k,i}/2}}
+                         {1 - e^{-\\beta h\\nu_{k,i}}}
+                      = \\frac{1}{2}\\prod_{i}^{\\kappa}\\textrm{csch}(\\beta h\\nu_{k,i}/2)
+
         Parameters
         ----------
         temperature : :obj:`numpy.ndarray`
@@ -397,6 +437,10 @@ class QuantumHarmonicPF(PartitionFunction):
         Method to calculate the derivative of the partition function
         with respect to Beta divided by the partition function (W).
 
+        .. math::
+            \\beta W_{vib,k} = {\\sum_{i=1}^{\\kappa}(\\beta h\\nu_{k,i}/2)
+                                \\textrm{coth}(\\beta h\\nu_{k,i}/2)}
+
         Parameters
         ----------
         temperature : :obj:`numpy.ndarray`
@@ -409,14 +453,13 @@ class QuantumHarmonicPF(PartitionFunction):
             of the partition function for each of the N minima, in the given
             temperature range.
         """
-        beta = calc_beta(temperature)
         exponent = calc_exponent(0.5 * H * self.frequencies[:, :, None],
                                  temperature)
         coth = 1. / np.tanh(exponent)
 
-        aux_w = -0.5 * H * np.sum(self.frequencies[:, :, None] * coth, axis=1)
-        part_func_w = np.multiply(beta**2, aux_w, where=temperature > 0,
-                                  out=np.zeros_like(aux_w))
+        aux_w = np.multiply(exponent, coth, where=temperature > 0,
+                            out=np.zeros_like(exponent))
+        part_func_w = np.sum(aux_w, axis=1)
 
         return part_func_w
 
@@ -424,6 +467,10 @@ class QuantumHarmonicPF(PartitionFunction):
         """
         Method to calculate the derivative of W with respect to Beta (V)
         multiplied by Beta squared.
+
+        .. math::
+            \\beta^2 V_{vib,k} = {\\sum_{i=1}^{\\kappa}(\\beta h\\nu_{k,i}/2)^2
+                                  \\textrm{csch}^2(\\beta h\\nu_{k,i}/2)}
 
         Parameters
         ----------
@@ -436,13 +483,12 @@ class QuantumHarmonicPF(PartitionFunction):
             A 2D array of shape (N, M) contaning the calculated derivatives
             of W for each of the N minima, in the given temperature range.
         """
-        beta = calc_beta(temperature)
         exponent = calc_exponent(0.5 * H * self.frequencies[:, :, None],
                                  temperature)
-        csch = 0.5 / np.sinh(exponent)
+        csch = 1. / np.sinh(exponent)
 
-        aux_v = np.sum((H * self.frequencies[:, :, None] * csch)**2, axis=1)
-        part_func_v = np.multiply(beta**2, aux_v, where=temperature > 0,
-                                  out=np.zeros_like(aux_v))
+        aux_v = np.multiply(exponent, csch, where=temperature > 0,
+                            out=np.zeros_like(exponent))
+        part_func_v = np.sum(aux_v**2, axis=1)
 
         return part_func_v

@@ -80,6 +80,9 @@ class SuperpositionApproximation():
     def calc_partition_functions(self, temperature):
         """ Calculates the partition functions of each local minimum considered.
 
+        .. math::
+            Z_k = Z_{elec,k}Z_{vib,k}Z_{rot,k}\\cdots
+
         Parameters
         ----------
         temperature : :obj:`numpy.ndarray`
@@ -99,6 +102,9 @@ class SuperpositionApproximation():
     def calc_probability(self, temperature):
         """
         Calculates the occupation probability in the temperature range provided.
+
+        .. math::
+            P_k = \\frac{Z_k}{Z}
 
         Parameters
         ----------
@@ -132,6 +138,9 @@ class SuperpositionApproximation():
         """
         Calculates the ensemble average for the given observable in the provided
         temperature range.
+
+        .. math::
+            \\langle A \\rangle = \\sum_{k=1}^{N}P_kA_k
 
         Parameters
         ----------
@@ -167,6 +176,14 @@ class SuperpositionApproximation():
     def calc_heat_capacity(self, temperature):
         """
         Calculates the canonical heat capacity for the given temperature range.
+
+        .. math::
+            \\frac{C_v}{k_B} &= \\beta^2 \\left[-\\frac{1}{Z^2} \\left(\\sum_k W_k Z_k\\right)^2
+                   + \\frac{1}{Z} \\sum_k \\left(W^2_k Z_k + V_k Z_k\\right)\\right] \\\\
+                &= -\\left(\\sum_k\\beta W_k P_k\\right)^2
+                       + \\sum_k \\beta^2 \\left(W^2_k P_k + V_k P_k\\right) \\\\
+                &= -\\langle \\beta W \\rangle^2 + \\langle (\\beta W)^2 \\rangle
+                   +\\langle \\beta^2 V \\rangle
 
         Parameters
         ----------
