@@ -52,19 +52,21 @@ def main():
                              help='Add vibrational partition function (quantum harmonic)')
     parser.add_argument('-r', '-R', action='store_true',
                         help='Add rotational partition function')
-    parser.add_argument('input_file', help='Extended XYZ file contaning the list of isomers')
-    parser.add_argument('--output', help='Output filename prefix')
+    parser.add_argument('in_file', help='Extended XYZ file contaning the list of isomers')
+    parser.add_argument('--out_file', help='Output filenames prefix')
+    parser.add_argument('--out_format', default='pdf',
+                        help='Output image files format (default: PDF)')
     parser.add_argument('--min_temp', type=float, default=0.,
                         help='Maximum temperature in K (default: 0)')
     parser.add_argument('--max_temp', type=float, default=500.,
                         help='Maximum temperature in K (default: 500)')
     parser.add_argument('--plot', action='store_true',
-                        help='Plot the results and save them as SVG image files')
+                        help='Plot the results and save them as image files')
     parser.add_argument('--size', type=float, nargs=2, default=[8., 6.],
                         help='Width and height of the output image, in inches (default: 8.0 6.0)')
     args = parser.parse_args()
 
-    properties = io.load_properties_from_extxyz(args.input_file)
+    properties = io.load_properties_from_extxyz(args.in_file)
 
     partition_functions = []
 
@@ -92,13 +94,13 @@ def main():
                    'c': superposition.calc_heat_capacity(temperature)}
 
         for key in results:
-            if args.output:
-                outfile = args.output + '_' + key
+            if args.out_file:
+                outfile = args.out_file + '_' + key
             else:
-                outfile = args.input_file.replace('.xyz', '_' + key)
+                outfile = args.in_file.replace('.xyz', '_' + key)
 
             if args.plot:
-                io.plot_results(results[key], temperature, outfile + '.svg',
+                io.plot_results(results[key], temperature, outfile + '.' + args.out_format.lower(),
                                 args.size, result_type=key)
 
             outdata = np.vstack((temperature, results[key]))
