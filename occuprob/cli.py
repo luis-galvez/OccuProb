@@ -74,7 +74,7 @@ def main():
     if args.s:
         partition_functions.append(ElectronicPF(properties['energy'],
                                                 properties['multiplicity']))
-    if args.v:
+    if args.c:
         partition_functions.append(ClassicalHarmonicPF(properties['frequencies']))
     if args.q:
         partition_functions.append(QuantumHarmonicPF(properties['frequencies']))
