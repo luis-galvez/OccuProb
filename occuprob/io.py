@@ -76,8 +76,9 @@ def load_properties_from_extxyz(xyz_filename):
 
     Returns
     -------
-    properties : dictionary
-        Dictionary contaning the properties of each isomer in the input file.
+    properties : dict
+        Dictionary that maps each key to the correspoding property of each
+        isomer in the input file.
     """
     isomers = read(xyz_filename, index=':')
 
@@ -104,34 +105,28 @@ def load_properties_from_extxyz(xyz_filename):
     return properties
 
 
-def plot_results(results, temperature, outfile, size, result_type):
+def plot_results(results, temperature, outfile, **plot_format):
     """ Plot results.
 
     Parameters
     ----------
     results : :obj:`numpy.ndarray`
-        .
+        Array containing the data to be plotted.
     temperature : :obj:`numpy.ndarray`
         A 1D array of size M containing the temperature values in K.
     outfile : string
         Output filename.
-    size : float, float
-        Width and height of the output figure.
-    results_type: string
-        Property to be plotted: 'probability' or 'p' for occupation probability;
-        'heat_capacity' or 'c' for heat capacity.
+    size : tuple of floats
+        Width and height of the output figure, e.g, (8., 6.)
+    plot_format : dict
     """
 
-    if result_type.lower() == 'probability' or result_type.lower() == 'p':
-        labels = ['ISO' + str(i) for i in range(len(results))]
-        hline_positions = [0, 1]
-        ymin, ymax = -0.05, 1.05
-        ylabel = r'Occupation probability, $P_k(T)$'
-    elif result_type.lower() == 'heat_capacity' or result_type.lower() == 'c':
-        labels = [None]
-        hline_positions = []
-        ymin, ymax = 0.0, 2. * np.ceil(results.max() / 2.)
-        ylabel = r'Heat capacity, $C_V/k_B$'
+    labels = plot_format['labels'] if 'labels' in plot_format else None
+    ylabel = plot_format['ylabel'] if 'ylabel' in plot_format else None
+    ylims = plot_format['ylims'] if 'ylims' in plot_format else None
+    size = plot_format['size'] if 'size' in plot_format else (8., 6.)
+    linewidth = plot_format['linewidth'] if 'linewidth' in plot_format else 2
+    hline_pos = plot_format['hline_pos'] if 'hline_pos' in plot_format else []
 
     plt.figure(figsize=size)
 
@@ -140,16 +135,19 @@ def plot_results(results, temperature, outfile, size, result_type):
 
     xmin, xmax = temperature[0], temperature[-1]
 
-    for position in hline_positions:
+    for position in hline_pos:
         plt.hlines(position, xmin, xmax, colors='silver', linestyles='--', lw=2)
 
     for i, result in enumerate(results):
-        plt.plot(temperature, result, label=labels[i], lw=2)
+        if labels:
+            plt.plot(temperature, result, label=labels[i], lw=linewidth)
+        else:
+            plt.plot(temperature, result, lw=linewidth)
 
     plt.xlim((xmin, xmax))
-    plt.ylim((ymin, ymax))
+    plt.ylim(ylims)
 
-    if labels[0]:
+    if labels:
         plt.legend()
 
     plt.tight_layout()
