@@ -106,19 +106,19 @@ def load_properties_from_extxyz(xyz_filename):
 
 
 def plot_results(results, temperature, outfile, **plot_format):
-    """ Plot results.
+    """ Function to plot the occupation probability, heat capacity or ensemble-
+    averaged properties.
 
     Parameters
     ----------
     results : :obj:`numpy.ndarray`
-        Array containing the data to be plotted.
+        A 2D array shape (N, M) containing the data to be plotted.
     temperature : :obj:`numpy.ndarray`
         A 1D array of size M containing the temperature values in K.
     outfile : string
         Output filename.
-    size : tuple of floats
-        Width and height of the output figure, e.g, (8., 6.)
     plot_format : dict
+        Dictionary containing parameters for the figure format.
     """
 
     labels = plot_format['labels'] if 'labels' in plot_format else None

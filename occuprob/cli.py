@@ -37,13 +37,38 @@ from ._version import get_versions
 
 
 def save_results(results, temperature, outfile):
-    """ Store results in a plain text file. """
+    """ Store results in a plain text file.
+
+    Parameters
+    ----------
+    results : :obj:`numpy.ndarray`
+        A 2D array shape (N, M) containing the data to be plotted.
+    temperature : :obj:`numpy.ndarray`
+        A 1D array of size M containing the temperature values in K.
+    outfile : string
+        Output filename.
+    """
     outdata = np.vstack((temperature, results)).T
     np.savetxt(outfile, outdata)
 
 
-def plot_results(results, results_type, temperature, plotfile, size):
-    """ Plots results. """
+def plot_results(results, results_type, temperature, outfile, size):
+    """ Plots results.
+
+    Parameters
+    ----------
+    results : :obj:`numpy.ndarray`
+        A 2D array shape (N, M) containing the data to be plotted.
+    results_type : {'P', 'C'}
+        Type of data to be plotted: can be 'P' for occupation probability or 'C'
+        for heat capacity.
+    temperature : :obj:`numpy.ndarray`
+        A 1D array of size M containing the temperature values in K.
+    outfile : string
+        Output filename.
+    size : tuple of floats
+        Width and height of the output figure, e.g, (8., 6.)
+    """
     plot_format = {}
 
     if results_type == 'P':
@@ -57,7 +82,7 @@ def plot_results(results, results_type, temperature, plotfile, size):
 
     plot_format['size'] = size
 
-    io.plot_results(results, temperature, plotfile, **plot_format)
+    io.plot_results(results, temperature, outfile, **plot_format)
 
 
 def main():
