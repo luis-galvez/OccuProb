@@ -56,6 +56,7 @@ autosummary_generate = True
 napoleon_google_docstring = False
 napoleon_use_param = False
 napoleon_use_ivar = True
+autodoc_member_order = 'bysource'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -166,7 +167,8 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'occuprob', 'OccuProb Documentation',
-     author, 'occuprob', 'A tool for calculating occupation probabilities and ensemble-averaged properties via the superposition approximation.',
+     author, 'occuprob', 'A tool for calculating occupation probabilities and' +
+     'ensemble-averaged properties via the superposition approximation.',
      'Miscellaneous'),
 ]
 
