@@ -4,4 +4,14 @@ API Documentation
 .. autosummary::
    :toctree: autosummary
 
-   occuprob.canvas
+Partition Functions
+-------------------
+
+.. automodule:: occuprob.partitionfunctions
+   :members:
+
+Superposition Approximation
+----------------------------
+
+.. automodule:: occuprob.superpositions
+   :members:

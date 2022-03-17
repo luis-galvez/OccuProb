@@ -1,4 +1,10 @@
 Getting Started
 ===============
 
-This page details how to get started with OccuProb. 
+This page details how to get started with OccuProb.
+
+
+Installation
+------------
+
+Install.

@@ -11,6 +11,7 @@ Welcome to OccuProb's documentation!
    :caption: Contents:
 
    getting_started
+   cli
    api
 
 
