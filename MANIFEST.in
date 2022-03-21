@@ -5,3 +5,4 @@ include versioneer.py
 
 graft occuprob
 global-exclude *.py[cod] __pycache__ *.so
+include occuprob/_version.py
