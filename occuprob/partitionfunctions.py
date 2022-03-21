@@ -60,12 +60,12 @@ class PartitionFunction(ABC):
     @abstractmethod
     def calc_part_func_w(self, temperature):
         """
-        Abstract method to calculate the derivative of the partition function
-        with respect to Beta divided by the partition function (W) multiplied
-        by Beta.
+        Method to calculate :math:`W_a`, the derivative of the partition function
+        with respect to :math:`\\beta` divided by the partition function,
+        multiplied by :math:`\\beta`:
 
         .. math::
-            W_k = \\frac{1}{Z_k} \\frac{\\partial Z_k}{\\partial \\beta}
+            \\beta W_a = \\frac{\\beta}{Z_a} \\frac{\\partial Z_a}{\\partial \\beta}
 
         Parameters
         ----------
@@ -83,11 +83,11 @@ class PartitionFunction(ABC):
     @abstractmethod
     def calc_part_func_v(self, temperature):
         """
-        Abstract method to calculate the derivative of W with respect to Beta (V)
-        multiplied by Beta squared.
+        Method to calculate :math:`V_a`, the derivative of :math:`W_a` with
+        respect to :math:`\\beta`, multiplied by :math:`\\beta^2`:
 
         .. math::
-            V_k = \\frac{\\partial W_k}{\\partial \\beta}
+            \\beta^2 V_a = \\beta^2 \\frac{\\partial W_a}{\\partial \\beta}
 
         Parameters
         ----------
@@ -124,10 +124,10 @@ class ElectronicPF(PartitionFunction):
     def calc_part_func(self, temperature):
         """
         Calculates the electronic canonical partition function in the given
-        temperature range.
+        temperature range:
 
         .. math::
-            Z_{elec,k} = g_{k}e^{-\\beta E_k}
+            Z_{elec,a} = g_{spin,a}e^{-\\beta E_a}
 
         Parameters
         ----------
@@ -148,11 +148,12 @@ class ElectronicPF(PartitionFunction):
 
     def calc_part_func_w(self, temperature):
         """
-        Method to calculate the derivative of the partition function
-        with respect to Beta divided by the partition function (W).
+        Method to calculate :math:`W_{elec,a}`, the derivative of the partition
+        function with respect to :math:`\\beta` divided by the partition function,
+        multiplied by :math:`\\beta`:
 
         .. math::
-            \\beta W_{elec,k} = -\\beta E_k
+            \\beta W_{elec,a} = -\\beta E_a
 
         Parameters
         ----------
@@ -176,11 +177,11 @@ class ElectronicPF(PartitionFunction):
 
     def calc_part_func_v(self, temperature):
         """
-        Method to calculate the derivative of W with respect to Beta (V)
-        multiplied by Beta squared.
+        Method to calculate :math:`V_{elec,a}`, the derivative of :math:`W_{elec,a}`
+        with respect to :math:`\\beta`, multiplied by :math:`\\beta^2`:
 
         .. math::
-            \\beta^2 V_{elec,k} = 0
+            \\beta^2 V_{elec,a} = 0
 
         Parameters
         ----------
@@ -224,9 +225,12 @@ class RotationalPF(PartitionFunction):
         temperature range.
 
         .. math::
-            Z_{rot,k} = \\frac{\\sqrt{\\pi}}{\\sigma_k}
-                         \\left(\\frac{2}{\\beta\\hbar}\\right)^{\\frac{3}{2}}
-                         \\sqrt{I_{k,1}I_{k,2}I_{k,3}}
+            Z_{rot,a} = \\frac{\\sqrt{\\pi}}{\\sigma_a}
+                        \\left(\\frac{2}{\\beta \\hbar^2}\\right)^{\\frac{3}{2}}
+                        \\sqrt{I_{a,1}I_{a,2}I_{a,3}}
+
+        .. note::
+            Test
 
         Parameters
         ----------
@@ -247,11 +251,12 @@ class RotationalPF(PartitionFunction):
 
     def calc_part_func_w(self, temperature):
         """
-        Method to calculate the derivative of the partition function
-        with respect to Beta divided by the partition function (W).
+        Method to calculate :math:`W_{rot,a}`, the derivative of the partition
+        function with respect to :math:`\\beta` divided by the partition function,
+        multiplied by :math:`\\beta`:
 
         .. math::
-            \\beta W_{rot,k} = -\\frac{3}{2}
+            \\beta W_{rot,a} = -\\frac{3}{2}
 
         Parameters
         ----------
@@ -272,11 +277,11 @@ class RotationalPF(PartitionFunction):
 
     def calc_part_func_v(self, temperature):
         """
-        Method to calculate the derivative of W with respect to Beta (V)
-        multiplied by Beta squared.
+        Method to calculate :math:`V_{rot,a}`, the derivative of :math:`W_{rot,a}`
+        with respect to :math:`\\beta`, multiplied by :math:`\\beta^2`:
 
         .. math::
-            \\beta^2 V_{rot,k} = \\frac{3}{2}
+            \\beta^2 V_{rot,a} = \\frac{3}{2}
 
         Parameters
         ----------
@@ -308,15 +313,18 @@ class ClassicalHarmonicPF(PartitionFunction):
 
     def __init__(self, frequencies):
         self.frequencies = frequencies
-        self.n_vib = frequencies.shape[1]  # Number of vibrational modes
+        self.num_vib = frequencies.shape[1]  # Number of vibrational modes
 
     def calc_part_func(self, temperature):
         """
-        Calculates the classical vibrational partition function in the given
-        temperature range.
+        Calculates the classical vibrational partition function :math:`Z_{vib,a}`
+        in the given temperature range:
 
         .. math::
-            Z_{vib,k} = \\left(\\beta h \\bar{\\nu}_k\\right)^{-\\kappa}
+            Z_{vib,a} = \\left(\\beta h \\bar{\\nu}_a\\right)^{-\\kappa}
+
+        where :math:`\\bar{\\nu}_a` is the geometric mean vibrational frequency
+        of minima $a$ and :math:`\\kappa` is the number of vibrational modes.
 
         Parameters
         ----------
@@ -332,18 +340,19 @@ class ClassicalHarmonicPF(PartitionFunction):
 
         frequencies_gmean = calc_geometric_mean(self.frequencies)
 
-        partition_function = np.outer(np.power(frequencies_gmean, -self.n_vib),
+        partition_function = np.outer(np.power(frequencies_gmean, -self.num_vib),
                                       np.ones_like(temperature))
 
         return partition_function
 
     def calc_part_func_w(self, temperature):
         """
-        Method to calculate the derivative of the partition function
-        with respect to Beta divided by the partition function (W).
+        Method to calculate :math:`W_{vib,a}`, the derivative of the partition
+        function with respect to :math:`\\beta` divided by the partition function,
+        multiplied by :math:`\\beta`:
 
         .. math::
-            \\beta V_{vib,k} = -\\kappa
+            \\beta V_{vib,a} = -\\kappa
 
         Parameters
         ----------
@@ -357,18 +366,18 @@ class ClassicalHarmonicPF(PartitionFunction):
             of the partition function for each of the N minima, in the given
             temperature range.
         """
-        part_func_w = -self.n_vib * np.ones([self.frequencies.shape[0],
-                                             temperature.size])
+        part_func_w = -self.num_vib * np.ones([self.frequencies.shape[0],
+                                               temperature.size])
 
         return part_func_w
 
     def calc_part_func_v(self, temperature):
         """
-        Method to calculate the derivative of W with respect to Beta (V)
-        multiplied by Beta squared.
+        Method to calculate :math:`V_{vib,a}`, the derivative of :math:`W_{vib,a}`
+        with respect to :math:`\\beta`, multiplied by :math:`\\beta^2`:
 
         .. math::
-            \\beta^2 V_{vib,k} = \\kappa
+            \\beta^2 V_{vib,a} = \\kappa
 
         Parameters
         ----------
@@ -409,9 +418,9 @@ class QuantumHarmonicPF(PartitionFunction):
         temperature range.
 
         .. math::
-            Z_{vib,k} = \\prod_{i=1}^{\\kappa}\\frac{e^{-\\beta h\\nu_{k,i}/2}}
-                         {1 - e^{-\\beta h\\nu_{k,i}}}
-                      = \\frac{1}{2}\\prod_{i}^{\\kappa}\\textrm{csch}(\\beta h\\nu_{k,i}/2)
+            Z_{vib,a} = \\prod_{i=1}^{\\kappa}\\frac{e^{-\\beta h\\nu_{a,i}/2}}
+                         {1 - e^{-\\beta h\\nu_{a,i}}}
+                      = \\frac{1}{2}\\prod_{i}^{\\kappa}\\textrm{csch}(\\beta h\\nu_{a,i}/2)
 
         Parameters
         ----------
@@ -434,12 +443,13 @@ class QuantumHarmonicPF(PartitionFunction):
 
     def calc_part_func_w(self, temperature):
         """
-        Method to calculate the derivative of the partition function
-        with respect to Beta divided by the partition function (W).
+        Method to calculate :math:`W_{vib,a}`, the derivative of the partition
+        function with respect to :math:`\\beta` divided by the partition function,
+        multiplied by :math:`\\beta`:
 
         .. math::
-            \\beta W_{vib,k} = {\\sum_{i=1}^{\\kappa}(\\beta h\\nu_{k,i}/2)
-                                \\textrm{coth}(\\beta h\\nu_{k,i}/2)}
+            \\beta W_{vib,a} = \\sum_{i=1}^{\\kappa}(\\beta h\\nu_{a,i}/2)
+                                \\textrm{coth}(\\beta h\\nu_{a,i}/2)
 
         Parameters
         ----------
@@ -465,12 +475,12 @@ class QuantumHarmonicPF(PartitionFunction):
 
     def calc_part_func_v(self, temperature):
         """
-        Method to calculate the derivative of W with respect to Beta (V)
-        multiplied by Beta squared.
+        Method to calculate :math:`V_{vib,a}`, the derivative of :math:`W_{vib,a}`
+        with respect to :math:`\\beta`, multiplied by :math:`\\beta^2`:
 
         .. math::
-            \\beta^2 V_{vib,k} = {\\sum_{i=1}^{\\kappa}(\\beta h\\nu_{k,i}/2)^2
-                                  \\textrm{csch}^2(\\beta h\\nu_{k,i}/2)}
+            \\beta^2 V_{vib,a} = \\sum_{i=1}^{\\kappa}[(\\beta h\\nu_{a,i}/2)
+                                  \\textrm{csch}(\\beta h\\nu_{a,i}/2)]^2
 
         Parameters
         ----------
