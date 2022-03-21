@@ -6,12 +6,25 @@ OccuProb
 
 A tool for calculating occupation probabilities and ensemble-averaged properties via the superposition approximation.
 
-### Copyright
+The full documentation can be found at https://occuprob.readthedocs.io/
+
+## References
+* [1] Wales, D.
+Properties of the Landscape. In *Energy Landscapes: Applications to Clusters, Biomolecules and Glasses*;
+Cambridge Molecular Science; Cambridge University Press: Cambridge, 2004; pp 364–433.
+[10.1017/CBO9780511721724.008](https://doi.org/10.1017/CBO9780511721724.008)
+
+* [2] Zhai, H.; Alexandrova, A.N.
+*Ensemble-Average Representation of Pt Clusters in Conditions of Catalysis Accessed through GPU Accelerated Deep Neural Network Fitting Global Optimization.*
+Journal of Chemical Theory and Computation, 2016, 12, 6213–6226.
+[10.1021/acs.jctc.6b00994](https://doi.org/10.1021/acs.jctc.6b00994)
+
+* [3] Gálvez-González, L.E.; Posada-Amarillas, A.; Paz-Borbón, L.O.
+*Structure, Energetics, and Thermal Behavior of Bimetallic Re–Pt Clusters.*
+The Journal of Physical Chemistry A, 2021, 125, 4294–4305.
+[10.1021/acs.jpca.0c11303](https://doi.org/10.1021/acs.jpca.0c11303)
+
+
+## Copyright
 
 Copyright (c) 2021-2022, Luis Galvez
-
-
-#### Acknowledgements
-
-Project based on the
-[Computational Molecular Science Python Cookiecutter](https://github.com/molssi/cookiecutter-cms) version 1.6.
