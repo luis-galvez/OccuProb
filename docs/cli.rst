@@ -11,3 +11,9 @@ Input files format
 ------------------
 
 Extended XYZ.
+
+Usage
+-----
+.. code-block:: console
+
+	occuprob -sqr Pt5_isomers.xyz --plot --max_temp=1000 --size 6 4

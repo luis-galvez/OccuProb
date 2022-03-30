@@ -8,12 +8,14 @@ Welcome to OccuProb's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Getting Started:
 
-   getting_started
+   installation
    cli
    api
 
+.. autosummary::
+  :toctree: autosummary
 
 
 Indices and tables

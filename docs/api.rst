@@ -1,17 +1,9 @@
 API Documentation
 =================
 
-.. autosummary::
-   :toctree: autosummary
+.. toctree::
+   :maxdepth: 2
 
-Partition Functions
--------------------
-
-.. automodule:: occuprob.partitionfunctions
-   :members:
-
-Superposition Approximation
-----------------------------
-
-.. automodule:: occuprob.superpositions
-   :members:
+   api_usage
+   partition_functions
+   superpositions
