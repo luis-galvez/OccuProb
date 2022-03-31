@@ -4,11 +4,22 @@ OccuProb
 [![GitHub Actions Build Status](https://github.com/luis-galvez/occuprob/workflows/CI/badge.svg)](https://github.com/REPLACE_WITH_OWNER_ACCOUNT/occuprob/actions?query=workflow%3ACI)
 
 
-A tool for calculating occupation probabilities and ensemble-averaged properties via the superposition approximation.
+OccuProb is a tool for calculating occupation probabilities and ensemble-averaged properties via the superposition approximation.
 
-The full documentation can be found at https://occuprob.readthedocs.io/
+## Quickstart
+### Installation
+The latest stable release can be installed via pip:
+```
+pip install occuprob
+
+```
+### Usage
+OccuProb can be used as an API or through its basic command-line interface (CLI).
+
+The detailed documentation including examples can be found at https://occuprob.readthedocs.io/
 
 ## References
+OccuProb is based on the theory found in the following works:
 * [1] Wales, D.
 Properties of the Landscape. In *Energy Landscapes: Applications to Clusters, Biomolecules and Glasses*;
 Cambridge Molecular Science; Cambridge University Press: Cambridge, 2004; pp 364–433.

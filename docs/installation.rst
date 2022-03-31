@@ -11,7 +11,7 @@ Requirements
 
 Installing via PyPI
 ~~~~~~~~~~~~~~~~~~~
-The latest stable release can be installed via ``pip``:
+The latest stable release can be installed from the Python Package Index (PyPI) using ``pip``:
 
 .. code-block:: console
 

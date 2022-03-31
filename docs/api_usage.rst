@@ -1,9 +1,12 @@
-Usage
-=====
+Usage example
+=============
 
-OccuProb...
+OccuProb can also be used as a Python API and coupled to other programs that calculate
+the required properties. This approach is more flexible than using the CLI,
+since its not limited to a specific input or output format.
 
-Code example:
+The following is an example script used to calculate and plot the occupation probability and the heat
+capacity for the isomers of a Pt\ :sub:`5` cluster:
 
 .. code-block:: python
 
@@ -54,9 +57,20 @@ Code example:
   ax2.set_xlim((temperature.min(), temperature.max()))
 
   # Plots the occupation probability of each isomer
-  for n, probability in enumerate(occupation_probability1):
+  for n, probability in enumerate(occupation_probability):
       ax2.plot(temperature, probability, linewidth=2, label=f"Isomer {n+1}")
   ax2.legend()
 
   # Plots the heat capacity
   ax1.plot(temperature, heat_capacity[0], linewidth=2)
+
+This script produces the following plot:
+
+.. image:: images/Pt5_API_example.svg
+
+In this case, the properties of the isomers are provided as NumPy arrays. The contributions
+to the total partition function of each isomer are calculated using the classes ``ElectronicPF``,
+``QuantumHarmonicPF`` and ``RotationalPF``. The ``SuperpositionApproximation`` class
+combines the partition function contributions and provides methods to calculate the
+occupation probability, the heat capacity at constant volume and ensemble-averaged
+properties.

@@ -1,4 +1,4 @@
-""" Module used to create Superposition Approximations to the PES. """
+""" Module used to combine partition function contributions and create superposition aproximations to the PES. """
 
 # MIT License
 

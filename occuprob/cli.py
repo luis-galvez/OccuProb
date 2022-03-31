@@ -110,8 +110,8 @@ def main():
                         help='Add rotational partition function')
     parser.add_argument('in_file', help='Extended XYZ file contaning the list of isomers')
     parser.add_argument('--out_file', help='Output filename prefix')
-    parser.add_argument('--plot_format', default='png',
-                        help='Output image files plot_format (default: PNG)')
+    parser.add_argument('--plot_format', default='svg',
+                        help='Output image files plot_format (default: SVG)')
     parser.add_argument('--min_temp', type=float, default=0.,
                         help='Maximum temperature in K (default: 0)')
     parser.add_argument('--max_temp', type=float, default=500.,
