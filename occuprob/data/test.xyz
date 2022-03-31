@@ -1,10 +1,10 @@
 3
-energy=0.0 multiplicity=2 frequencies="1.0 1.0 1.0"
+Energy=0.0 Multiplicity=2 Frequencies="1.0 1.0 1.0"
 H -1.0 0.0 0.0
 H  0.0 0.0 0.0
 H  1.0 0.0 0.0
 3
-energy=0.0 multiplicity=2 frequencies="1.0 1.0 1.0"
+Energy=0.0 Multiplicity=2 Frequencies="1.0 1.0 1.0"
 H  1.0 0.0 0.0
 H  0.0 1.0 0.0
 H  0.0 0.0 1.0
