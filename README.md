@@ -18,7 +18,7 @@ OccuProb can be used as an API or through its basic command-line interface (CLI)
 The detailed documentation including examples can be found at https://occuprob.readthedocs.io/
 
 ## References
-OccuProb is based on the theory found in the following works:
+OccuProb is based on the following works:
 * [1] Wales, D.
 Properties of the Landscape. In *Energy Landscapes: Applications to Clusters, Biomolecules and Glasses*;
 Cambridge Molecular Science; Cambridge University Press: Cambridge, 2004; pp 364–433.
