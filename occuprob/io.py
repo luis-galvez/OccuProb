@@ -90,9 +90,9 @@ def load_properties_from_extxyz(xyz_filename):
 
     # Reads the values from the input file
     for atoms in isomers:
-        energies.append(atoms.info['energy'])
-        spin_multiplicity.append(atoms.info['multiplicity'])
-        frequencies.append(atoms.info['frequencies'].flatten(order='F'))
+        energies.append(atoms.info['Energy'])
+        spin_multiplicity.append(atoms.info['Multiplicity'])
+        frequencies.append(atoms.info['Frequencies'].flatten(order='F'))
         moments_of_inertia.append(atoms.get_moments_of_inertia())
         symmetry_order.append(calc_symmetry_order(atoms))
 

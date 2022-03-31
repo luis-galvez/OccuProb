@@ -72,7 +72,7 @@ def plot_results(results, results_type, temperature, outfile, size):
     plot_format = {}
 
     if results_type == 'P':
-        plot_format['labels'] = ['ISO' + str(i) for i in range(len(results))]
+        plot_format['labels'] = ['Isomer ' + str(i+1) for i in range(len(results))]
         plot_format['hline_pos'] = [0, 1]
         plot_format['ylims'] = (-0.05, 1.05)
         plot_format['ylabel'] = r'Occupation probability, $P_a(T)$'
