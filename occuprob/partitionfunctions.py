@@ -229,9 +229,6 @@ class RotationalPF(PartitionFunction):
                         \\left(\\frac{2}{\\beta \\hbar^2}\\right)^{\\frac{3}{2}}
                         \\sqrt{I_{a,1}I_{a,2}I_{a,3}}
 
-        .. note::
-            Test
-
         Parameters
         ----------
         temperature : :obj:`numpy.ndarray`

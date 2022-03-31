@@ -68,7 +68,9 @@ produces the following images for the heat capacity and the occupation probabili
 of Pt\ :sub:`5`:
 
 .. image:: images/Pt5_heat_capacity.svg
+   :align: center
 .. image:: images/Pt5_probability.svg
+   :align: center
 
 List of options
 ---------------
@@ -87,5 +89,5 @@ in_file                   Extended XYZ file contaning the list of isomers
 --min_temp MIN_TEMP       Maximum temperature in K (default: 0)
 --max_temp MAX_TEMP       Maximum temperature in K (default: 500)
 --plot                    Plot the results and save them as image files
---size SIZE SIZE          Width and height of the output image, in inches (default: 8.0 6.0)
+--size SIZE SIZE          Width and height of the output image in inches (default: 8.0 6.0)
 ========================= ==================================================================

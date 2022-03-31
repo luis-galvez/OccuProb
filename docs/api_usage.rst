@@ -67,6 +67,7 @@ capacity for the isomers of a Pt\ :sub:`5` cluster:
 This script produces the following plot:
 
 .. image:: images/Pt5_API_example.svg
+   :align: center
 
 In this case, the properties of the isomers are provided as NumPy arrays. The contributions
 to the total partition function of each isomer are calculated using the classes ``ElectronicPF``,
