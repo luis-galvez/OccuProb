@@ -12,7 +12,6 @@ The latest stable release can be installed via pip:
 ```
 pip install occuprob
 ```
-
 ### Usage
 OccuProb can be used as an API or through its basic command-line interface (CLI).
 
